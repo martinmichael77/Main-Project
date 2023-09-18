@@ -1,0 +1,20 @@
+<!-- patient/view_profile_history.html -->
+
+{% extends "base.html" %}
+{% block content %}
+  <h1>Profile Change History</h1>
+  {% if profile_changes %}
+    <ul>
+      {% for change in profile_changes %}
+        <li>
+          <p><strong>Timestamp:</strong> {{ change.timestamp }}</p>
+          <p><strong>Birth Date:</strong> {{ change.birth_date }}</p>
+          <p><strong>Gender:</strong> {{ change.gender }}</p>
+          <!-- Add more fields as needed -->
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No profile changes found.</p>
+  {% endif %}
+{% endblock %}

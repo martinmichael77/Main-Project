@@ -1,0 +1,47 @@
+{% extends 'patient/base.html' %}
+
+{% block body %}
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="col-sm-8">
+                <h4 class="text-center alert alert-info">Disease Diagnosed</h4>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Disease</th>
+                            <th scope="col">Medicine</th>
+                            <th scope="col">Appointment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                        <input type="hidden" value="{{ user.id }}" name="" id="user_id">
+                        {% for d in disease %}
+                        <tr>
+                            <td>{{ d.id }}</td>
+                            <td>{{ d.patient.profile.full_name }}</td> <!-- Display the full name here -->
+                            <td>{{ d.disease }}</td>
+                            {% if d.medicine == "" %}
+                            <td>Yet Recommended</td>
+                            {% else %}
+                            <td>{{ d.medicine }}</td>
+                            {% endif %}
+                            <td>
+                                <input class="btn btn-success btn-sm btn_ment" type="button" data-sid="{{d.id}}" value="Request">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div id="ment_result" class="col-sm-10 offset-sm-3"></div>
+                <!--- Rest of your HTML code -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

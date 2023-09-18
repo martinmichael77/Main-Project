@@ -1,0 +1,236 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Registration</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static 'fonts_sign/icomoon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css_sign/owl.carousel.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css_sign/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css_sign/style.css' %}">
+  <!--<link rel="stylesheet" href="{% static 'css/validater.css' %}">-->
+</head>
+<body>
+<div class="content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 order-md-2">
+        <img src="{% static 'images_sign/cvr.jpeg' %}" alt="Image" class="img-fluid">
+      </div>
+      <div class="col-md-6 contents">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="mb-4">
+              <h3> <strong>Create new account</strong></h3>
+            </div>
+            <form class="validate-form" method="post" action="{% url 'register' %}">
+              {% csrf_token %}
+              {% if messages %}
+                  <ul class="messages">
+                  {% for message in messages %}
+                      <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: {% if message.tags == 'error' %}red{% endif %}">{{ message }}</li>
+                  {% endfor %}
+                  </ul>
+              {% endif %}
+              <div class="form-group first wrap-input100 validate-input">
+                <label for="Firstname">Firstname</label>
+                <input type="text" class="form-control" id="fn"  name="fname" required>
+                <span id="fnspan"></span>
+                
+            </div>
+              <div class="form-group first wrap-input100 validate-input" data-validate="name should contain only alphabets and must be atleast 3 characters long">
+                <label for="lastname">Lastname</label>
+                <input type="text" class="form-control" id="sn" name="sname" required>
+                <span id="snspan"></span>
+            </div>
+              <div class="form-group wrap-input100 validate-input" data-validate="name should contain only alphabets and must be atleast 3 characters long">
+                  <label for="username">Username</label>
+                  <input type="text" class="form-control" id="username" name="uname" required>
+              </div>
+              <div class="form-group wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="mail" name="email" required>
+                  <span id="emspan"></span>
+              </div>
+              <div class="form-group wrap-input100 validate-input" data-validate="Password should contain an uppercase, lowercase, special character, and numeric letter with a minimum length of 5 and maximum length of 12">
+                  <label for="password">Password</label>
+                  <input type="password" class="form-control" id="pass" name="pwd" required>
+                  <span id="pspan"></span>
+              </div>
+              <div class="form-group wrap-input100 validate-input" data-validate="Confirm password should match with Password">
+                  <label for="cnpassword">Confirm Password</label>
+                  <input type="password" class="form-control" id="cpass" name="cpwd" required>
+                  <span id="cpspan"></span>
+              </div>
+          
+              <div class="d-flex mb-5 align-items-center">
+                  <label class="control control--checkbox mb-0">
+                      <span class="caption">Remember me</span>
+                      <input type="checkbox" checked="checked" name="remember" />
+                      <div class="control__indicator"></div>
+                  </label>
+              </div>
+          
+              <input type="submit" value="Sign Up" class="btn text-white btn-block btn-primary">
+            </form>
+          
+
+            
+             {% comment %}
+              <div class="form-container">
+                <!-- ... other form elements ... -->
+                <span class="d-block text-left my-4 text-muted">or sign up with</span
+                <div class="social-login">
+                      <a href="{% static '#' %}" class="facebook">
+                          <span class="icon-facebook mr-3"></span> 
+                      </a>
+                      <a href="{% static '#' %}" class="twitter">
+                          <span class="icon-twitter mr-3"></span> 
+                      </a>
+                    
+                    <a href="{% static '#' %}" class="google">
+                        <span class="icon-google mr-3"></span> 
+                    </a>
+                </div>
+              </div>
+              {% endcomment %}
+
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js_sign/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'js-sign/popper.min.js' %}"></script>
+<script src="{% static 'js_sign/bootstrap.min.js' %}"></script>
+<script src="{% static 'js_sign/main.js' %}"></script>
+{% comment %} <script src="{% static 'js/validate.js' %}"></script> {% endcomment %}
+<script>
+  $(document).ready(function () {
+    $("#fn").keyup(function () {
+        validateName("#fn");
+    });
+
+    $("#sn").keyup(function () {
+        validatelName("#sn");
+    });
+
+    $("#mail").keyup(function () {
+        validateEmail("#mail");
+    });
+
+    $("#pass").keyup(function () {
+        validatePassword("#pass");
+    });
+
+    $("#cpass").keyup(function () {
+        validateConfirmPassword("#cpass");
+    });
+
+});
+
+  // valid first name
+function validateName(fieldId) {
+    var name = $(fieldId).val();
+    var lettersWithSpaces = /^[A-Za-z\s]+$/;
+    if (name.trim() === "") {
+         $("#fnspan").html("Enter the Name").css("color", "red");
+       // alert("Please fill the first name");
+    } else if (!lettersWithSpaces.test(name)) {
+         $("#fnspan").html("Name field required only alphabet characters with spaces").css("color", "red");
+        //alert("Name field required only alphabet characters with spaces and numeric Values");
+    } else {
+        $("#fnspan").html("");
+    }
+}
+
+  //  valid last name
+function validatelName(fieldId) {
+    var name = $(fieldId).val();
+    var lettersWithSpaces = /^[A-Za-z\s]+$/;
+    if (name.trim() === "") {
+         $("#snspan").html("Enter the Name").css("color", "red");
+       //alert("Please fill the last name")
+    } else if (!lettersWithSpaces.test(name)) {
+      //alert("Name field required only alphabet characters with spaces and numeric values")
+        $("#snspan").html("Name field required only alphabet characters with spaces").css("color", "red");
+    } else {
+        $("#snspan").html("");
+    }
+}
+
+//validate username
+function validateName(fieldId) {
+  var name = $(fieldId).val();
+  var lettersWithSpaces = /^[A-Za-z\s]+$/;
+  if (name.trim() === "") {
+       $("#fnspan").html("Enter the Name").css("color", "red");
+     // alert("Please fill the first name");
+  } else if (!lettersWithSpaces.test(name)) {
+       $("#fnspan").html("Name field required only alphabet characters with spaces").css("color", "red");
+      //alert("Name field required only alphabet characters with spaces and numeric Values");
+  } else {
+      $("#fnspan").html("");
+  }
+}
+
+function validateEmail(fieldId) {
+    var email = $(fieldId).val();
+    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (email === "") {
+        $("#emspan").html("Enter the Email Id").css("color", "red");
+        //alert("Please fill Email Id")
+    } else if (!filter.test(email)) {
+         $("#emspan").html("Use correct Email Id").css("color", "red");
+      //  alert("Use correct Email Id")
+    } else {
+        $("#emspan").html("");
+    }
+}
+
+function validatePassword(fieldId) {
+    var password = $(fieldId).val();
+    var pwd_expression = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/;
+    if (password === "") {
+        $("#pspan").html("Enter the Password").css("color", "red");
+        //alert("Please fill the Password")
+    }else if(!pwd_expression.test(password))
+            {
+              //alert("Use Correct Password Format")
+              $("#pspan").html("Use correct Password Format").css("color", "red");
+
+           }
+    else 
+    {
+        $("#pspan").html("");
+    }
+}
+
+function validateConfirmPassword(fieldId) {
+    var password = $("#pass").val();
+    var confirmPassword = $(fieldId).val();
+    if (confirmPassword === "") {
+        // $("#cpspan").html("Enter the Confirm Password").css("color", "red");
+        alert("Please fill the confirm Password")
+    } else if (confirmPassword !== password) {
+         $("#cpspan").html("Password do not match").css("color", "red");
+        // alert("Password do not match")
+    } else {
+        $("#cpspan").html("");
+    }
+}
+</script>
+</body>
+</html>

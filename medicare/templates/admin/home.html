@@ -1,0 +1,89 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Overview</li>
+        </ol>
+
+        <!-- Icon Cards and Chart-->
+        <div class="row">
+            <!-- Icon Cards -->
+            <!-- ... Your existing icon cards ... -->
+
+            <!-- Chart -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i>
+                        Data Visualization
+                    </div>
+                    <div class="card-body">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js library -->
+<script src="{% static 'core/js/Chart.min.js' %}"></script>
+
+<!-- Include Chart.js library -->
+<script src="{% static 'core/js/Chart.min.js' %}"></script>
+
+<script>
+    // JavaScript code to populate data and create a chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+
+    var data = {
+        labels: ["Drugs", "Patients", "Appointments", "Doctors"],
+        datasets: [{
+            label: 'Data Visualization',
+            data: [
+                {{ drug }},
+                {{ patient }},
+                {{ ment }},
+                {{ doctor }}
+            ],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    var options = {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    };
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: options
+    });
+</script>
+
+{% endblock %}

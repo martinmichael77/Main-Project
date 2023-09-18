@@ -1,0 +1,63 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+<style>
+    .card-body {
+        text-align: center;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .btn-danger {
+        background-color: #ff4d4f;
+        border-color: #ff4d4f;
+    }
+
+    .btn-danger:hover {
+        background-color: #ff3336;
+        border-color: #ff3336;
+    }
+
+    .btn-secondary {
+        background-color: #ccc;
+        border-color: #ccc;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background-color: #aaa;
+        border-color: #aaa;
+        color: #333;
+    }
+</style>
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="card-body">
+                <h2>Delete Doctor</h2>
+                <p>Are you sure you want to delete {{ doctor.get_full_name }}?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <a href="{% url 'doctor_info' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

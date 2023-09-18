@@ -1,0 +1,62 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+        <!-- Add export buttons with top margin -->
+        <div style="position: absolute; top: 70px; right: 20px;">
+            <a href="{% url "export_csv" %}" class="btn btn-primary">Export CSV</a>
+            <a href="{% url "export_pdf" %}" class="btn btn-secondary">Export PDF</a>
+        </div>
+
+        <!-- Icon Cards-->
+        <div class="row">
+
+            <div class="card-body">
+
+                <h2>Patient Information</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Symptom 1</th>
+                            <th>Symptom 2</th>
+                            <th>Symptom 3</th>
+                            <th>Symptom 4</th>
+                            <th>Symptom 5</th>
+                            <th>Disease Diagnosed</th>
+                            <th>Treatment Recommended</th>
+                            <!-- Add more table headers as needed -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.patient.profile.full_name }}</td>
+                            <td>{{ patient.s1 }}</td>
+                            <td>{{ patient.s2 }}</td>
+                            <td>{{ patient.s3 }}</td>
+                            <td>{{ patient.s4 }}</td>
+                            <td>{{ patient.s5 }}</td>
+                            <td>{{ patient.disease }}</td>
+                            <td>{{ patient.medicine }}</td>
+                            <!-- Add more table data fields as needed -->
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8">No patient information available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

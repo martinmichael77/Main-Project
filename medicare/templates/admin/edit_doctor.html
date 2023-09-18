@@ -1,0 +1,118 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+
+<script>
+    // Function to validate first and last name
+    function validateName(inputField) {
+        var nameRegex = /^[a-zA-Z]+$/;
+        var fieldValue = inputField.value;
+        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue.trim()) {
+            feedback.innerHTML = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!nameRegex.test(fieldValue)) {
+            feedback.innerHTML = "Only alphabets are allowed.";
+            feedback.style.color = "red";
+        } else {
+            feedback.innerHTML = "";
+        }
+    }
+
+    // Function to validate email
+    function validateEmail(inputField) {
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        var fieldValue = inputField.value;
+        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue.trim()) {
+            feedback.innerHTML = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!emailRegex.test(fieldValue)) {
+            feedback.innerHTML = "Invalid email address.";
+            feedback.style.color = "red";
+        } else {
+            feedback.innerHTML = "";
+        }
+    }
+
+    // Function to validate license number
+    function validateLicenseNumber(inputField) {
+        var licenseRegex = /^MDIN\d+$/;
+        var fieldValue = inputField.value;
+        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue.trim()) {
+            feedback.innerHTML = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!licenseRegex.test(fieldValue)) {
+            feedback.innerHTML = "License number should start with 'MDIN' followed by digits.";
+            feedback.style.color = "red";
+        } else {
+            feedback.innerHTML = "";
+        }
+    }
+
+    // Function to validate phone number
+    function validatePhoneNumber(inputField) {
+        var phoneRegex = /^\d{10}$/;
+        var fieldValue = inputField.value;
+        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue.trim()) {
+            feedback.innerHTML = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!phoneRegex.test(fieldValue)) {
+            feedback.innerHTML = "Invalid Phone number";
+            feedback.style.color = "red";
+        } else {
+            feedback.innerHTML = "";
+        }
+    }
+</script>
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="card-body">
+
+                <h2 style="margin-bottom: 20px;">Edit Doctor Information</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ doctor.first_name }}" required class="form-control" oninput="validateName(this)">
+                        <div class="feedback" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ doctor.last_name }}" required class="form-control" oninput="validateName(this)">
+                        <div class="feedback" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" name="email" value="{{ doctor.email }}" class="form-control" oninput="validateEmail(this)">
+                        <div class="feedback" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="license_no">License Number:</label>
+                        <input type="text" id="license_no" name="license_no" value="{{ doctor.license_no }}" required class="form-control" oninput="validateLicenseNumber(this)">
+                        <div class="feedback" style="color: red;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input type="text" id="phone" name="phone" value="{{ doctor.phone }}" required class="form-control" oninput="validatePhoneNumber(this)">
+                        <div class="feedback" style="color: red;"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
