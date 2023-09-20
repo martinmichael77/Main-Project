@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'medicapp',
     'jazzmin',
     'allauth',
+    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -176,4 +177,5 @@ DEFAULT_FROM_EMAIL = 'mailtoshowvalidationok@gmail.com'
 
 
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use the appropriate template pack (e.g., 'bootstrap4' for Bootstrap 4)
 

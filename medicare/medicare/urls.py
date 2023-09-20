@@ -37,6 +37,11 @@ urlpatterns = [
     path('export_pdf/', views.export_pdf, name='export_pdf'),
     path('export_csv/', views.export_csv, name='export_csv'),
     path('home/', views.home, name='home'),  
+    path('view_patient_info/', views.view_patient_info, name='view_patient_info'),
+    path('book_appointment/<int:doctor_id>/', views.book_appointment, name='book_appointment'),
+
+    
+
 
 
     # PASSWORD RESET

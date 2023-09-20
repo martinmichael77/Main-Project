@@ -1,49 +1,151 @@
 {% extends 'patient/base.html' %}
-
+{% load static %}
 {% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <!DOCTYPE html>
+        <html lang="en-US" dir="ltr">
 
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Medicare-Patient Dashboard</title>
+            <link rel="apple-touch-icon" sizes="180x180" href="">
+            <link rel="icon" type="image/png" sizes="32x32" href="">
+            <link rel="icon" type="image/png" sizes="16x16" href="">
+            <link rel="shortcut-icon" type="image/x-icon" href="}">
+            <link rel="manifest" href="">
+            <meta name="msapplication-TileImage" content="">
+            <meta name="theme-color" content="#ffffff">
+            <link href="{% static 'assets/css/theme.css' %}" rel="stylesheet" />
+        </head>
+        <body>
+            <main class="main" id="top">
+                <section class="py-xxl-10 pb-0" id="home">
+                  <div class="bg-holder bg-size" style="background-image:url({% static "assets/img/gallery/hero-bg.png" %});background-position:top center;background-size:cover;">
+                  </div>
+                  <div class="container">
+                    <div class="row min-vh-xl-100 min-vh-xxl-25">
+                      <div class="col-md-5 col-xl-6 col-xxl-7 order-0 order-md-1 text-end"><img class="pt-7 pt-md-0 w-100" src="{% static "assets/img/gallery/hero.png" %}" alt="hero-header" /></div>
+                      <div class="col-md-75 col-xl-6 col-xxl-5 text-md-start text-center py-6">
+                        <h1 class="fw-light font-base fs-6 fs-xxl-7">We're <strong>determined </strong>for<br />your&nbsp;<strong>better life.</strong></h1>
+                        <p class="fs-1 mb-5">You can get the care you need 24/7 – be it online or in <br />person. You will be treated by caring specialist doctors. </p>
+                        <a class="btn btn-lg btn-primary rounded-pill" href="{% url 'book_appointment' doctor.id %}" role="button">Make an Appointment</a>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <section class="py-5" id="departments">        
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-12 py-3">
+                        <div class="bg-holder bg-size" style="background-image:url({% static "assets/img/gallery/bg-departments.png" %});background-position:top center;background-size:contain;">
+                        </div>
+                        <h1 class="text-center">OUR DEPARTMENTS</h1>
+                      </div>
+                    </div>
+                  </div>       
+                </section>
+                <section class="py-0">
+                  <div class="container">
+                    <div class="row py-5 align-items-center justify-content-center justify-content-lg-evenly">
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/neurology.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/neurology.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">Neurology</p>
+                            </a></div>
+                        </div>
+                      </div>
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/eye-care.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/eye-care.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">Eye care</p>
+                            </a></div>
+                        </div>
+                      </div>
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/cardiac.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/cardiac.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">Cardiac care</p>
+                            </a></div>
+                        </div>
+                      </div>
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/heart.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/heart.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">Heart care</p>
+                            </a></div>
+                        </div>
+                      </div>
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/osteoporosis.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/osteoporosis.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">Osteoporosis</p>
+                            </a></div>
+                        </div>
+                      </div>
+                      <div class="col-auto col-md-4 col-lg-auto text-xl-start">
+                        <div class="d-flex flex-column align-items-center">
+                          <div class="icon-box text-center"><a class="text-decoration-none" href="#!"><img class="mb-3 deparment-icon" src="{% static "assets/img/icons/ent.png" %}" alt="..." /><img class="mb-3 deparment-icon-hover" src="assets/img/icons/ent.svg" alt="..." />
+                              <p class="fs-1 fs-xxl-2 text-center">ENT</p>
+                            </a></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <section class="bg-secondary">
+                  <div class="bg-holder" style="background-image:url({% static "assets/img/gallery/bg-eye-care.png" %});background-position:center;background-size:contain;">
+                  </div>
+                  <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-md-5 col-xxl-6"><img class="img-fluid" src="{% static "assets/img/gallery/eye-care.png" %}" alt="..." /></div>
+                        <div class="col-md-7 col-xxl-6 text-center text-md-start">
+                            <h2 class="fw-bold text-light mb-4 mt-4 mt-lg-0">How Our System Works<br class="d-none d-sm-block" /></h2>
+                            <p class="text-light">Our system simplifies healthcare by using advanced technology. You start by sharing your symptoms, and we predict potential diseases. Then, we offer personalized treatment recommendations based on your health history. You can schedule appointments, access educational resources, and communicate securely with healthcare providers. We prioritize your data privacy and ensure you're always in control. It's like having a virtual healthcare assistant, making your health journey more accessible and efficient.</p>
+                        </div>
+                    </div>
+                </div>
+                </section>
+                <section class="pb-0" id="about">
+          
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-12 py-3">
+                        <div class="bg-holder bg-size" style="background-image:url({% static "assets/img/gallery/about-us.png" %});background-position:top center;background-size:contain;">
+                        </div>
+                  </section>
+                </section>
+              </main>
+            <script src="{% static 'vendors/@popperjs/popper.min.js' %}"></script>
+            <script src="{% static 'vendors/bootstrap/bootstrap.min.js' %}"></script>
+            <script src="{% static 'vendors/is/is.min.js' %}"></script>
+            <script src="https://scripts.sirv.com/sirvjs/v3/sirv.js"></script>
+            <script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>
+            <script src="{% static 'vendors/fontawesome/all.min.js' %}"></script>
+            <script src="{% static 'assets/js/theme.js' %}"></script>
 
- <div id="content-wrapper">
-
-        <div class="container-fluid">
-
-            <!-- Breadcrumbs-->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item active">Overview</li>
-            </ol>
-
-             <!-- Icon Cards-->
-            
-
-            {% if profile_status %}
-
-              <center>
-                  <h2 style="color: red"> 
-
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&amp;family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100&amp;display=swap" rel="stylesheet">
+        </body>
+        </html>
+        {% if profile_status %}
+        <center>
+            <h2 style="color: red">
                 {{profile_status}}
-
-              </h2> 
-              </center>
-
-            {% endif %}
-
-
-
-                        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-
-                    <div class="alert alert-success" style="color:green;"> {{ message }}</div>
-
-                {% endfor %}
-            </div>
-            {% endif %}
-            
+            </h2>
+        </center>
+        {% endif %}
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-success" style="color:green;"> {{ message }}</div>
+            {% endfor %}
         </div>
-        </div>
-
-{% endblock %}
-
+        {% endif %}
+    </div>
+    </div>
+    {% endblock %}

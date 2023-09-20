@@ -23,7 +23,7 @@
                         {% for doctor in doctors %}
                             <tr>
                                 <td>{{ doctor.get_full_name }}</td>
-                                <td>{{ doctor.email }}</td>
+                                <td>{{ doctor.user.email }}</td>
                                 <td>{{ doctor.license_no }}</td>
                                 <td>{{ doctor.phone }}</td>
                                 <td>

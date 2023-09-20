@@ -49,11 +49,19 @@ def login(request):
         username = request.POST.get('uname')
         password = request.POST.get('pwd')
         user = authenticate(request, username=username, password=password)
+
+
+        try:
+            user_role = UserRole.objects.get(user=user)
+            user_role_name = user_role.role
+        except UserRole.DoesNotExist:
+            user_role_name = None
+
         if user is not None:
             auth_login(request, user)
             if user.is_superuser:
                 return redirect('admin_dashboard')
-            elif user.is_staff:
+            elif user_role_name == 'Doctor':
                  return redirect ('doctor')
             else:
                 return redirect('patient')
@@ -313,25 +321,35 @@ class PatientListView(ListView):
 import csv
 from .models import Doctor  
 
+import csv
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Doctor
+
+from django.contrib.auth.models import User
+from .models import Doctor, UserRole  # Import the UserRole model
+
+from django.contrib.auth.models import User
+from .models import Doctor, UserRole
+from django.shortcuts import redirect, render, get_object_or_404
+
 def add_doctor(request):
     if request.method == 'POST':
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         license_no = request.POST['license_no']
-        email = request.POST['email'] 
-        phone = request.POST['phone'] 
+        email = request.POST['email']
+        phone = request.POST['phone']
 
-        existing_doctor = Doctor.objects.filter(
-            first_name=first_name,
-            last_name=last_name,
-            license_no=license_no
-        ).first()
+        # Check if a user with the same email already exists
+        existing_user = User.objects.filter(username=email).first()
 
-        if existing_doctor:
-            messages.error(request, 'Credentials already exist')
+        if existing_user:
+            messages.error(request, 'User with this email already exists')
         else:
-            csv_file_path = 'doctor_dataset/docinfo.csv'  
-            match_found = False  
+            csv_file_path = 'doctor_dataset/docinfo.csv'
+            match_found = False
 
             with open(csv_file_path, 'r') as csv_file:
                 csv_reader = csv.DictReader(csv_file)
@@ -342,21 +360,39 @@ def add_doctor(request):
                         row['License Number'] == license_no
                     ):
                         match_found = True
-                        break  
+                        break
 
             if match_found:
-                doctor = Doctor(
+                # Create a new user
+                user = User.objects.create_user(
+                    username=email,
                     first_name=first_name,
                     last_name=last_name,
+                    email=email,
+                )
+
+                # Set the default password for the user
+                user.set_password("Doctor@medicare7")
+                user.save()
+
+                # Create a new Doctor
+                doctor = Doctor(
+                    user=user,
                     license_no=license_no,
-                    email=email,  
-                    phone=phone,  
+                    phone=phone,
                 )
                 doctor.save()
+
+                # Set the user's role to 'Doctor'
+                user_role = UserRole(user=user, role='Doctor')
+                user_role.save()
+
                 messages.success(request, 'Doctor added successfully')
             else:
                 messages.error(request, 'No matching records found')
+
     return render(request, 'admin/add_doctor.html', context={'messages': messages.get_messages(request)})
+
 
 
 #VIEW DOCTORS
@@ -384,7 +420,20 @@ def delete_doctor(request, doctor_id):
     doctor = get_object_or_404(Doctor, id=doctor_id)
 
     if request.method == 'POST':
+        # Delete the associated user
+        user = doctor.user
+        user.delete()
+
+        # Delete the doctor record
         doctor.delete()
+
+        # Delete the user role record (if exists)
+        try:
+            user_role = UserRole.objects.get(user=user)
+            user_role.delete()
+        except UserRole.DoesNotExist:
+            pass
+
         return redirect('doctor_info')
 
     return render(request, 'admin/delete_doctor.html', {'doctor': doctor})
@@ -485,3 +534,73 @@ def user_profile(request):
     user = request.user  
     profile = Profile.objects.get(user=user)  
     return render(request, 'patient/user_profile.html', {'user': user, 'profile': profile})
+
+
+from django.shortcuts import render
+from .models import Medical
+
+def view_patient_info(request):
+    patients = Medical.objects.all()
+    return render(request, 'doctor/view_patient_info.html', {'patients': patients})
+
+
+
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Appointment
+from .forms import AppointmentForm, CurrentUserForm
+
+@login_required
+def book_appointment(request, doctor_id):
+    doctor = Doctor.objects.get(id=doctor_id)
+    context = {}
+
+    if request.method == 'POST':
+        appointment_form = AppointmentForm(request.POST)
+        user_form = CurrentUserForm(request.POST)
+
+        if appointment_form.is_valid() and user_form.is_valid():
+            appointment = appointment_form.save(commit=False)
+            appointment.doctor = doctor
+            appointment.patient = request.user
+            appointment.save()
+            return redirect('confirm-appointment')  # Adjust the URL name as needed
+    else:
+        appointment_form = AppointmentForm()
+        user_form = CurrentUserForm(initial={
+            'name': request.user.profile.full_name,
+            'email': request.user.email,
+            'phone': request.user.profile.phone_number,
+        })
+
+    context['appointment_form'] = appointment_form
+    context['user_form'] = user_form
+    context['doctor'] = doctor
+
+    return render(request, 'patient/appointments.html', context)
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Doctor
+
+@login_required
+def patient_home(request):
+    # Assuming you are getting the doctor object based on some logic
+    doctor = Doctor.objects.first()  # Replace with your logic to get the doctor
+
+    context = {
+        'doctor': doctor,
+    }
+
+    return render(request, 'patient/home.html', context)
+
+
+
+
+
+

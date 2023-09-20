@@ -1,0 +1,58 @@
+{% extends 'doctor/base.html' %}
+{% load static %}
+
+{% block body %}
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+        <!-- Add export buttons with top margin -->
+        
+        <!-- Icon Cards-->
+        <div class="row">
+
+            <div class="card-body">
+
+                <h2 class="mb-4">Patient Information</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Symptom 1</th>
+                                <th>Symptom 2</th>
+                                <th>Symptom 3</th>
+                                <th>Symptom 4</th>
+                                <th>Symptom 5</th>
+                                <th>Disease Diagnosed</th>
+                                <!-- Add more table headers as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td>{{ patient.patient.profile.full_name }}</td>
+                                <td>{{ patient.s1 }}</td>
+                                <td>{{ patient.s2 }}</td>
+                                <td>{{ patient.s3 }}</td>
+                                <td>{{ patient.s4 }}</td>
+                                <td>{{ patient.s5 }}</td>
+                                <td>{{ patient.disease }}</td>
+                                <!-- Add more table data fields as needed -->
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8">No patient information available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

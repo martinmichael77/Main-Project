@@ -8,11 +8,73 @@
     <div class="container-fluid">
 
         <!-- Add export buttons with top margin -->
+        
+        <!-- Icon Cards-->
+        <div class="row">
+
+            <div class="card-body">
+
+
+<style>
+    /* Custom styles for the user profile page */
+    .container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        margin-top: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #e1e1e1;
+        border-radius: 5px;
+        margin-top: 20px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    p {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px 5px 0 0;
+    }
+
+    /* Style for the User Information card */
+    #user-info-card {
+        border-color: #28a745;
+    }
+
+    /* Style for the Profile Details card */
+    #profile-details-card {
+        border-color: #007bff;
+    }
+
+    /* Add more custom styles as needed */
+</style>
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+        <!-- User Profile Container -->
         <div class="container">
             <h1 class="mt-4">User Profile</h1>
-        
-            <!-- User Information -->
-            <div class="card mt-4">
+
+            <!-- User Information Card -->
+            <div class="card" id="user-info-card">
                 <div class="card-header">
                     User Information
                 </div>
@@ -21,9 +83,9 @@
                     <p><strong>Email:</strong> {{ user.email }}</p>
                 </div>
             </div>
-        
-            <!-- Profile Details -->
-            <div class="card mt-4">
+
+            <!-- Profile Details Card -->
+            <div class="card" id="profile-details-card">
                 <div class="card-header">
                     Profile Details
                 </div>
@@ -37,14 +99,13 @@
             </div>
         </div>
 
+        
+
         <!-- Icon Cards-->
         <div class="row">
-
             <div class="card-body">
-
-                
+                <!-- Add your icon cards or content here -->
             </div>
-
         </div>
     </div>
 </div>
