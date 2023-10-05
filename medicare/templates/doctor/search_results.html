@@ -1,0 +1,17 @@
+<!-- search_results.html -->
+{% extends 'doctor/base.html' %}
+
+{% block content %}
+<h2>Medical Record Search Results</h2>
+<form method="get" action="{% url 'search_results' %}">
+    {{ search_form.as_p }}
+    <button type="submit">Search</button>
+</form>
+<ul>
+    {% for record in records %}
+        <li>{{ record.disease }} - {{ record.patient.get_full_name }}</li>
+    {% empty %}
+        <li>No results found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

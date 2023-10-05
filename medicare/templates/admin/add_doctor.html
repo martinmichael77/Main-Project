@@ -100,7 +100,21 @@
                                 <input type="email" class="form-control" id="email" name="email" placeholder="Your email address" oninput="validateEmail(this)">
                                 <div class="feedback" style="color: red;"></div>
                             </div>
-
+                            <div class="form-group">
+                                <label for="specialization">Specialization</label>
+                                <select class="form-control" id="specialization" name="specialization" required>
+                                    <option value="" disabled selected>Choose Specialization</option>
+                                    <option value="Dermatologists">Dermatologists</option>
+                                    <option value="Allergists">Allergists</option>
+                                    <option value="Diabetologists">Diabetologists</option>
+                                    <option value="Infectious Disease Specialists">Infectious Disease Specialists</option>
+                                    <option value="Neurologists">Neurologists</option>
+                                    <option value="Gastroenterologists">Gastroenterologists</option>
+                                    <option value="Urologists">Urologists</option>
+                                    {% comment %} <option value="HIV Specialists">HIV Specialists</option> {% endcomment %}
+                                </select>
+                            </div>
+                            
                             <div class="form-group">
                                 <label for="license_no">License Number</label>
                                 <input type="text" class="form-control" id="license_no" name="license_no" placeholder="Your License Number" oninput="validateLicenseNumber(this)">

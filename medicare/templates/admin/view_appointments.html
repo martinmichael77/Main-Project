@@ -1,0 +1,117 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Add export buttons with top margin -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">List of Appointments</h2>
+                        <form method="get" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="status-filter">Filter by Status:</label>
+                                    <select id="status-filter" name="status" class="form-control">
+                                        <option value="all" {% if selected_status == 'all' %}selected{% endif %}>All</option>
+                                        <option value="confirmed" {% if selected_status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                        <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                                        <option value="scheduled" {% if selected_status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Patient</th>
+                                        <th>Doctor</th>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr class="appointment-row" data-status="{{ appointment.status }}">
+                                        <td>{{ appointment.id }}</td>
+                                        <td>{{ appointment.patient.get_full_name }}</td>
+                                        <td>{{ appointment.doctor.get_full_name }}</td>
+                                        <td>{{ appointment.date|date:"M d, Y" }}</td>
+                                        <td>{{ appointment.time }}</td>
+                                        <td>
+                                            {% if appointment.status == 'confirmed' %}
+                                                <span class="badge badge-success">Confirmed</span>
+                                            {% elif appointment.status == 'completed' %}
+                                                <span class="badge badge-secondary">Completed</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">Scheduled</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Filter Options -->
+
+        <!-- Icon Cards -->
+        <div class="row">
+            <!-- Rest of your code remains the same -->
+            <div class="col-md-12">
+                <div class="card">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Additional CSS styles for proper alignment and aesthetics */
+    .card-title {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .table {
+        width: 100%;
+    }
+
+    .thead-dark th {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .badge {
+        font-size: 14px;
+    }
+</style>
+
+<script>
+    // JavaScript to handle filter selection
+    document.getElementById("status-filter").addEventListener("change", function () {
+        var selectedStatus = this.value;
+        var appointments = document.getElementsByClassName("appointment-row");
+
+        for (var i = 0; i < appointments.length; i++) {
+            var appointment = appointments[i];
+            var appointmentStatus = appointment.getAttribute("data-status");
+
+            if (selectedStatus === "all" || selectedStatus === appointmentStatus) {
+                appointment.style.display = "table-row";
+            } else {
+                appointment.style.display = "none";
+            }
+        }
+    });
+</script>
+
+{% endblock %}

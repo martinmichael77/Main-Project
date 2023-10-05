@@ -9,13 +9,20 @@
         <div class="row">
             <div class="card-body">
                 <h2>Doctor Information</h2>
+                <div class="search-bar" style="float: right;">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search...">
+                </div>
+                <div style="clear: both;"></div> <!-- Add a clearing element -->
+
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Email Address</th>
+                            <th>Specialization</th>
                             <th>License Number</th>
                             <th>Phone Number</th>
+                            <th class="cell">Status</th>
                             <th>Actions</th> <!-- Added Actions column -->
                         </tr>
                     </thead>
@@ -24,11 +31,19 @@
                             <tr>
                                 <td>{{ doctor.get_full_name }}</td>
                                 <td>{{ doctor.user.email }}</td>
+                                <td>{{ doctor.specialization }}</td>
                                 <td>{{ doctor.license_no }}</td>
                                 <td>{{ doctor.phone }}</td>
+                                <td class="cell">
+                                    {% if doctor.is_active %}
+                                        Active
+                                    {% else %}
+                                        Inactive
+                                    {% endif %}
+                                </td>
                                 <td>
-                                    <a href="{% url 'edit_doctor' doctor.id %}" class="btn btn-primary btn-sm">Edit</a>
-                                    <a href="{% url 'delete_doctor' doctor.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                    <a href="{% url 'activate_doctor' doctor.id %}" class="btn btn-primary btn-sm">Activate</a>
+                                    <a href="{% url 'deactivate_doctor' doctor.id %}" class="btn btn-danger btn-sm">Deactivate</a>
                                 </td>
                             </tr>
                         {% empty %}
@@ -42,5 +57,21 @@
         </div>
     </div>
 </div>
+<script>
+    // JavaScript for handling live search functionality
+    document.getElementById('search-input').addEventListener('input', function () {
+        var searchTerm = this.value.toLowerCase();
+        var tableRows = document.querySelectorAll('.table tbody tr');
+
+        tableRows.forEach(function (row) {
+            var rowData = row.textContent.toLowerCase();
+            if (rowData.includes(searchTerm)) {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 {% endblock %}

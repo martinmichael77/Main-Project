@@ -14,46 +14,66 @@ class UserProfileForm(forms.ModelForm):
 from django import forms
 from .models import Appointment
 
-class AppointmentForm(forms.ModelForm):
-    class Meta:
-        model = Appointment
-        fields = ['date', 'time', 'status', 'patient', 'doctor']
-        widgets = {
-            'date': forms.DateInput(
-                attrs={
-                    'placeholder': 'YYYY-MM-DD',
-                    'class': 'form-control form-control-lg',
-                    'type': 'date',
-                }
-            ),
-            'time': forms.TimeInput(
-                attrs={
-                    'placeholder': 'HH:MM',
-                    'class': 'form-control form-control-lg',
-                    'type': 'time',
-                }
-            ),
-            'status': forms.Select(
-                attrs={'class': 'form-control form-control-lg'}
-            ),
-            'patient': forms.Select(
-                attrs={'class': 'form-control form-control-lg'}
-            ),
-            'doctor': forms.Select(
-                attrs={'class': 'form-control form-control-lg'}
-            ),
-        }
+# class AppointmentForm(forms.ModelForm):
+#     SPECIALIZATION_CHOICES = [
+#         ('Dermatologists', 'Dermatologists'),
+#         ('Allergists', 'Allergists'),
+#         ('Diabetologists', 'Diabetologists'),
+#         ('Infectious Disease Specialists', 'Infectious Disease Specialists'),
+#         ('Neurologists', 'Neurologists'),
+#         ('Gastroenterologists', 'Gastroenterologists'),
+#         ('Urologists', 'Urologists'),
+#         ('HIV Specialists', 'HIV Specialists'),
+#     ]
 
-from django import forms
-from django.contrib.auth.models import User  # Import the User model
+#     # Add the specialization field using ChoiceField
+#     specialization = forms.ChoiceField(
+#         choices=SPECIALIZATION_CHOICES,
+#         required=False,  # Set to False if you want it to be optional
+#         widget=forms.Select(attrs={'class': 'form-control form-control-lg'})
+#     )
+#     class Meta:
+#         model = Appointment
+#         fields = ['date', 'time', 'patient','specialization', 'doctor']
+#         widgets = {
+#             'date': forms.DateInput(
+#                 attrs={
+#                     'placeholder': 'YYYY-MM-DD',
+#                     'class': 'form-control form-control-lg',
+#                     'type': 'date',
+#                 }
+#             ),
+#             'time': forms.TimeInput(
+#                 attrs={
+#                     'placeholder': 'HH:MM',
+#                     'class': 'form-control form-control-lg',
+#                     'type': 'time',
+#                 }
+#             ),
+#             'patient': forms.TextInput(
+#                 attrs={
+#                     'class': 'form-control form-control-lg',
+#                     'readonly': True,
+#                 }
+#             ),
+#             # 'specialization': forms.TextInput(
+#             #     attrs={
+#             #         'class': 'form-control form-control-lg'
+#             #         }
+#             # ),
+#             'doctor': forms.Select(
+#                 attrs={'class': 'form-control form-control-lg'}
+#             ),
+#         }
 
-class CurrentUserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'placeholder': 'Enter Your First Name', 'id': 'first_name'}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Enter Your Last Name', 'id': 'last_name'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'Enter Your Email', 'id': 'email'}),
-            # 'phone_number': forms.TextInput(attrs={'placeholder': 'Enter Your Phone Number', 'id': 'phone_number'}),
-        }
+#     def __init__(self, *args, **kwargs):
+#         user = kwargs.pop('user', None)
+#         super().__init__(*args, **kwargs)
+#         if user:
+#             self.fields['patient'].initial = user
+
+
+
+
+
+

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'jazzmin',
     'allauth',
     'crispy_forms',
+    'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -173,9 +174,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mailtoshowvalidationok@gmail.com'  
 EMAIL_HOST_PASSWORD = 'qtwpnirvgsxzhtdo'  
-DEFAULT_FROM_EMAIL = 'mailtoshowvalidationok@gmail.com'
+DEFAULT_FROM_EMAIL = 'admin@medicare.com'
 
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use the appropriate template pack (e.g., 'bootstrap4' for Bootstrap 4)
 
+RAZOR_KEY_ID = 'rzp_test_xfrnYSFQFDBO1w'
+RAZOR_KEY_SECRET = 'Md6mU2L9gPD18FUtXhm8nRim'

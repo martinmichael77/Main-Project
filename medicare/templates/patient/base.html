@@ -68,11 +68,18 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'ment_list' %} ">
+            <a class="nav-link" href="{% url 'view_appointments' %} ">
                 <i class="fas fa-calendar text-primary"></i>
                 <span style="color: white">Appointment</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "medical_report" %} ">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Medical Report</span>
+            </a>
+        </li>
+        
         {% else %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'create_profile' %}">

@@ -1,0 +1,92 @@
+{% extends 'patient/base.html' %}
+{% load static %}
+{% load humanize %} {# Load humanize for naturaltime filter #}
+
+{% block body %}
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="text-right"> <!-- Add this div for alignment -->
+                        <a href="{% url 'generate_pdf' medical_record.id %}" class="btn btn-primary">Download PDF</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1 class="mb-4 text-center text-primary">Medicare - Health Records</h1>
+                            <p class="text-right text-muted">{{ current_datetime|date:"F d, Y" }}</p>
+                        </div>
+
+                        {% if medical_record %}
+                        <div class="patient-info">
+                            <h2 class="mb-3">Patient Information</h2>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> {{ current_user.get_full_name }}</p>
+                                    <p><strong>Date of Birth:</strong> {{ current_user.profile.birth_date|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Gender:</strong> {{ current_user.profile.gender }}</p>
+                                    <p><strong>Contact:</strong> {{ current_user.profile.phone_number }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="report-section">
+                            <h2 class="mb-3">Symptoms</h2>
+                            <ul class="list-group">
+                                <li class="list-group-item"><strong>Symptom 1:</strong> {{ medical_record.s1 }}</li>
+                                <li class="list-group-item"><strong>Symptom 2:</strong> {{ medical_record.s2 }}</li>
+                                <li class="list-group-item"><strong>Symptom 3:</strong> {{ medical_record.s3 }}</li>
+                                <li class="list-group-item"><strong>Symptom 4:</strong> {{ medical_record.s4 }}</li>
+                                <li class="list-group-item"><strong>Symptom 5:</strong> {{ medical_record.s5 }}</li>
+                            </ul>
+                        </div>
+
+                        <div class="report-section">
+                            <h2 class="mb-3">Diagnosis</h2>
+                            <p><strong>Diagnosis:</strong> {{ medical_record.disease }}</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h2 class="mb-3">Recommended Treatment</h2>
+                            <p>{{ medical_record.medicine }}</p>
+                        </div>
+
+                        <div class="report-section">
+                            <h2 class="mb-3">Consulting Doctor</h2>
+                            <p><strong>Doctor:</strong> {{ medical_record.doctor.get_full_name }}</p>
+                        </div>
+                        {% else %}
+                        <p>No medical record found for {{ current_user.get_full_name }}.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom CSS styles */
+    .card {
+        border: 2px solid #17a2b8;
+        border-radius: 10px;
+    }
+
+    .text-primary {
+        color: #17a2b8;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .list-group-item {
+        background-color: #f8f9fa;
+    }
+</style>
+
+{% endblock %}

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime
+from datetime import datetime, timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -286,16 +286,16 @@ def MakeMend(request):
         return JsonResponse({'status': 'not in store'})
     
 #DOCTOR APPOINTMENT
-@login_required
-def doctor_ment(request):
-    user_id = request.user.id
-    appointment = Treatment.objects.all()
-    context = {'ment':appointment, 'status':'1'}
-    return render(request, 'doctor/ment.html', context)
+# @login_required
+# def doctor_ment(request):
+#     user_id = request.user.id
+#     appointment = Treatment.objects.all()
+#     context = {'ment':appointment, 'status':'1'}
+#     return render(request, 'doctor/ment.html', context)
 
 #ADMIN DASHBOARD
 def admin_dashboard(request):
-    return render(request, 'admin/base1.html')
+    return render(request, 'admin/home.html')
 
 
 #PATIENT INFO
@@ -319,17 +319,10 @@ class PatientListView(ListView):
     
 #ADD DOCTOR
 import csv
-from .models import Doctor  
-
-import csv
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Doctor
-
-from django.contrib.auth.models import User
-from .models import Doctor, UserRole  # Import the UserRole model
-
 from django.contrib.auth.models import User
 from .models import Doctor, UserRole
 from django.shortcuts import redirect, render, get_object_or_404
@@ -341,6 +334,8 @@ def add_doctor(request):
         license_no = request.POST['license_no']
         email = request.POST['email']
         phone = request.POST['phone']
+        specialization = request.POST['specialization']  # Add this line to get specialization
+
 
         # Check if a user with the same email already exists
         existing_user = User.objects.filter(username=email).first()
@@ -378,6 +373,7 @@ def add_doctor(request):
                 # Create a new Doctor
                 doctor = Doctor(
                     user=user,
+                    specialization = specialization,
                     license_no=license_no,
                     phone=phone,
                 )
@@ -387,9 +383,16 @@ def add_doctor(request):
                 user_role = UserRole(user=user, role='Doctor')
                 user_role.save()
 
+                subject = 'Your account has been created'
+                message = 'Your account has been created.Use password Doctor@medicare7 to login'
+                from_email = settings.EMAIL_HOST_USER  # Your sender email address
+                recipient_list = [user.email]
+                send_mail(subject, message, from_email, recipient_list)
                 messages.success(request, 'Doctor added successfully')
             else:
                 messages.error(request, 'No matching records found')
+
+        
 
     return render(request, 'admin/add_doctor.html', context={'messages': messages.get_messages(request)})
 
@@ -401,52 +404,52 @@ def doctor_info(request):
     return render(request, 'admin/doctorinfo.html', {'doctors': doctors})
 
 #EDIT DOCTOR DETAILS 
-def edit_doctor(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
+# def edit_doctor(request, doctor_id):
+#     doctor = get_object_or_404(Doctor, id=doctor_id)
 
-    if request.method == 'POST':
-        doctor.first_name = request.POST['first_name']
-        doctor.last_name = request.POST['last_name']
-        doctor.email = request.POST['email']
-        doctor.license_no = request.POST['license_no']
-        doctor.phone = request.POST['phone']
-        doctor.save()
-        return redirect('doctor_info')
+#     if request.method == 'POST':
+#         doctor.first_name = request.POST['first_name']
+#         doctor.last_name = request.POST['last_name']
+#         doctor.email = request.POST['email']
+#         doctor.license_no = request.POST['license_no']
+#         doctor.phone = request.POST['phone']
+#         doctor.save()
+#         return redirect('doctor_info')
 
-    return render(request, 'admin/edit_doctor.html', {'doctor': doctor})
+#     return render(request, 'admin/edit_doctor.html', {'doctor': doctor})
 
-# DELETE DOCTOR
-def delete_doctor(request, doctor_id):
-    doctor = get_object_or_404(Doctor, id=doctor_id)
+# # DELETE DOCTOR
+# def delete_doctor(request, doctor_id):
+#     doctor = get_object_or_404(Doctor, id=doctor_id)
 
-    if request.method == 'POST':
-        # Delete the associated user
-        user = doctor.user
-        user.delete()
+#     if request.method == 'POST':
+#         # Delete the associated user
+#         user = doctor.user
+#         user.delete()
 
-        # Delete the doctor record
-        doctor.delete()
+#         # Delete the doctor record
+#         doctor.delete()
 
-        # Delete the user role record (if exists)
-        try:
-            user_role = UserRole.objects.get(user=user)
-            user_role.delete()
-        except UserRole.DoesNotExist:
-            pass
+#         # Delete the user role record (if exists)
+#         try:
+#             user_role = UserRole.objects.get(user=user)
+#             user_role.delete()
+#         except UserRole.DoesNotExist:
+#             pass
 
-        return redirect('doctor_info')
+#         return redirect('doctor_info')
 
-    return render(request, 'admin/delete_doctor.html', {'doctor': doctor})
+#     return render(request, 'admin/delete_doctor.html', {'doctor': doctor})
 
 #EXPORT PDF OF PATIENTINFO
 import tablib
 from django.http import FileResponse
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, KeepTogether
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-from .models import Medical  
+from .models import Medical
 
 def export_pdf(request):
     patients = Medical.objects.all()
@@ -466,22 +469,39 @@ def export_pdf(request):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
-    styles = getSampleStyleSheet()
-    heading_style = styles['Heading1']
-    heading = Paragraph("Patient Information", heading_style)
-    elements.append(heading)
-    table = Table(data)
+
+    # Define column widths for the table
+    col_widths = [100, 60, 60, 60, 60, 60, 100, 100]  # Adjust widths as needed
+
+    # Define table style
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.beige),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),  # Reduced font size to 10 for data rows
+        ('SIZE', (0, 0), (-1, 0), 8),
     ])
+
+    # Create the table with specified column widths and apply the style
+    table = Table(data, colWidths=col_widths)
     table.setStyle(style)
-    elements.append(table)
+
+    # Add a title to the PDF
+    styles = getSampleStyleSheet()
+    heading_style = styles['Heading1']
+    heading_style.alignment = 1  # 0=Left, 1=Center, 2=Right
+    heading = Paragraph("Medicare - Patient Records", heading_style)
+
+
+    # Wrap the table in KeepTogether to ensure it doesn't break across pages
+    elements.append(KeepTogether([heading, table]))
+
+    # Build the PDF and prepare the response
     doc.build(elements)
     buffer.seek(0)
     response = FileResponse(buffer, as_attachment=True, filename='patient_information.pdf')
@@ -536,6 +556,7 @@ def user_profile(request):
     return render(request, 'patient/user_profile.html', {'user': user, 'profile': profile})
 
 
+#VIEW PATIENT INFO
 from django.shortcuts import render
 from .models import Medical
 
@@ -544,54 +565,63 @@ def view_patient_info(request):
     return render(request, 'doctor/view_patient_info.html', {'patients': patients})
 
 
-
-
-
-
-
+#BOOK APPOINTMENTS
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Appointment
-from .forms import AppointmentForm, CurrentUserForm
+from .models import Appointment, Doctor
 
-@login_required
+
+
+def create_appointment(request):
+    return render(request, 'patient/appointments.html')
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+
 def book_appointment(request, doctor_id):
-    doctor = Doctor.objects.get(id=doctor_id)
-    context = {}
-
+    doctor = get_object_or_404(Doctor, pk=doctor_id)
+    
     if request.method == 'POST':
-        appointment_form = AppointmentForm(request.POST)
-        user_form = CurrentUserForm(request.POST)
-
-        if appointment_form.is_valid() and user_form.is_valid():
-            appointment = appointment_form.save(commit=False)
-            appointment.doctor = doctor
-            appointment.patient = request.user
-            appointment.save()
-            return redirect('confirm-appointment')  # Adjust the URL name as needed
+        # Get the data from the POST request
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        patient = request.user  # Assuming the patient is the currently logged-in user
+        specialization = request.POST.get('id_specialization')
+        selected_doctor_id = request.POST.get('id_doctor')
+        selected_doctor = get_object_or_404(Doctor, pk=selected_doctor_id)
+        
+        # Create and save the appointment
+        appointment = Appointment(
+            date=date,
+            time=time,
+            patient=patient,
+            specialization=specialization,
+            doctor=selected_doctor
+        )
+        appointment.save()
+        
+        success_message = "Appointment created successfully!"
+        return JsonResponse({'success_message': success_message})
+    
     else:
-        appointment_form = AppointmentForm()
-        user_form = CurrentUserForm(initial={
-            'name': request.user.profile.full_name,
-            'email': request.user.email,
-            'phone': request.user.profile.phone_number,
-        })
-
-    context['appointment_form'] = appointment_form
-    context['user_form'] = user_form
-    context['doctor'] = doctor
-
-    return render(request, 'patient/appointments.html', context)
+        # Render the initial HTML form
+        return render(request, 'patient/appointments.html', {'doctor': doctor})
 
 
+
+
+from django.shortcuts import render
+
+
+
+#PATIENT HOME
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Doctor
 
 @login_required
 def patient_home(request):
-    # Assuming you are getting the doctor object based on some logic
-    doctor = Doctor.objects.first()  # Replace with your logic to get the doctor
+    doctor = Doctor.objects.first()
 
     context = {
         'doctor': doctor,
@@ -600,7 +630,356 @@ def patient_home(request):
     return render(request, 'patient/home.html', context)
 
 
+#ACTIVATE DOCTOR
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Doctor
+from django.urls import reverse
+from django.core.mail import send_mail
+from django.conf import settings
+
+@login_required
+def activate_doctor(request, doctor_id):
+    try:
+        doctor = get_object_or_404(Doctor, pk=doctor_id)
+        user = doctor.user
+        if user:
+            user.is_active = True
+            user.save()
+            doctor.is_active = True
+            doctor.save()
+            messages.success(request, f'Doctor {doctor.get_full_name()} has been activated.')
+        else:
+            messages.error(request, 'Associated user not found.')
+        subject = 'Your account has been activated'
+        message = 'Your account has been activated successfully.'
+        from_email = settings.EMAIL_HOST_USER  
+        recipient_list = [user.email]
+
+        send_mail(subject, message, from_email, recipient_list)
+
+    except Doctor.DoesNotExist:
+        messages.error(request, 'Doctor not found.')
+
+    return redirect(reverse('doctor_info'))  
+
+
+#DEACTIVATE DOCTOR
+@login_required
+def deactivate_doctor(request, doctor_id):
+    try:
+        doctor = get_object_or_404(Doctor, pk=doctor_id)
+        user = doctor.user
+        if user:
+            user.is_active = False
+            user.save()
+            doctor.is_active = False
+            doctor.save()
+            messages.success(request, f'Doctor {doctor.get_full_name()} has been deactivated.')
+        else:
+            messages.error(request, 'Associated user not found.')
+
+        subject = 'Your account has been deactivated'
+        message = 'Your account has been deactivated.'
+        from_email = settings.EMAIL_HOST_USER 
+        recipient_list = [user.email]
+        send_mail(subject, message, from_email, recipient_list)
+
+    except Doctor.DoesNotExist:
+        messages.error(request, 'Doctor not found.')
+
+    return redirect(reverse('doctor_info')) 
+
+
+#VIEW APPOINTMENTS @DOCTOR SIDE
+from django.shortcuts import render
+from .models import Appointment
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def doctor_appointments(request):
+    doctor = request.user.doctor_profile
+    appointments = Appointment.objects.filter(doctor=doctor)
+
+    context = {
+        'appointments': appointments
+    }
+
+    return render(request, 'doctor/appointments.html', context)
+
+
+#CONFIRM APPOITMENTS
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Appointment, Doctor
+from django.conf import settings  # Import the settings module
+
+@login_required
+def confirm_appointment(request, appointment_id):
+    appointment = Appointment.objects.get(pk=appointment_id)
+    if appointment.doctor == request.user.doctor_profile:
+        if appointment.status == 'scheduled':
+            appointment.status = 'confirmed'
+            appointment.save()
+
+            subject = 'Appointment Confirmed'
+            message = 'Your appointment is confirmed.'
+            from_email = settings.EMAIL_HOST_USER  
+            recipient_list = [appointment.patient.email] 
+            send_mail(subject, message, from_email, recipient_list)
+
+    return redirect('doctor_appointments')
+
+
+
+#APPOITMENT COMPLETED
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Appointment, Doctor
+from django.conf import settings 
+
+@login_required
+def complete_appointment(request, appointment_id):
+    appointment = Appointment.objects.get(pk=appointment_id)
+    if appointment.doctor == request.user.doctor_profile:
+        if appointment.status == 'confirmed':
+            appointment.status = 'completed'
+            appointment.save()
+            subject = 'Appointment Completed'
+            message = 'Your appointment has been completed.'
+            from_email = settings.EMAIL_HOST_USER 
+            recipient_list = [appointment.patient.email] 
+            send_mail(subject, message, from_email, recipient_list)
+
+    return redirect('doctor_appointments')
+
+
+#VIEW APPOITMENTS STATUS @PATIENT SIDE
+from django.shortcuts import render
+from .models import Appointment
+
+def view_appointments(request):
+    user_appointments = Appointment.objects.filter(patient=request.user)
+
+    return render(request, 'patient/view_appointment.html', {'ment': user_appointments})
+
+
+#LIST APPOINTMENTS @ADMIN SIDE
+from django.shortcuts import render
+from .models import Appointment
+
+def list_appointments(request):
+    selected_status = request.GET.get('status', 'all')
+    if selected_status == 'all':
+        appointments = Appointment.objects.all()
+    else:
+        appointments = Appointment.objects.filter(status=selected_status)
+
+    context = {
+        'appointments': appointments,
+        'selected_status': selected_status,
+    }
+
+    return render(request, 'admin/view_appointments.html', context)
 
 
 
 
+
+
+
+
+from django.http import JsonResponse
+
+def get_subcategories(request):
+    category_id = request.GET.get('category_id')
+    subcategories = Doctor.objects.filter(specialization=category_id)
+    
+    # Create a list of dictionaries containing doctor information
+    subcategory_options = [{'id': doctor.id, 'name': doctor.get_full_name()} for doctor in subcategories]
+    
+    return JsonResponse({'subcategories': subcategory_options})
+
+
+
+from django.shortcuts import render, redirect
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
+
+# authorize razorpay client with API Keys.
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+
+
+def appointment_success(request):
+    currency = 'INR'
+    amount = 20000  # Rs. 200
+ 
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(amount=amount,
+                                                       currency=currency,
+                                                       payment_capture='0'))
+ 
+    # order id of newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = '/paymenthandler/'
+ 
+    # we need to pass these details to frontend.
+    context = {}
+    context['razorpay_order_id'] = razorpay_order_id
+    context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
+    context['razorpay_amount'] = amount
+    context['currency'] = currency
+    context['callback_url'] = callback_url
+ 
+    return render(request, 'patient/appointment_success.html',context=context)
+
+@csrf_exempt
+def paymenthandler(request):
+    if request.method == "POST":
+        try:
+            # Get the payment details from the POST request
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+
+            # Verify the payment signature
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+            result = razorpay_client.utility.verify_payment_signature(params_dict)
+
+            if result is not None:
+                amount = 20000  # Rs. 200
+
+                # Capture the payment
+                razorpay_client.payment.capture(payment_id, amount)
+
+                # Save payment details to the Payment model
+                # Assuming you have a Payment model defined
+                payment = Payment.objects.create(
+                    user=request.user,  # Assuming you have a logged-in user
+                    payment_amount=amount,
+                    payment_status='Success',  # Assuming payment is successful
+                )
+
+                # Redirect to a success page with payment details
+                return redirect('payment_success')  # Replace 'orders' with your actual success page name or URL
+            else:
+                # Signature verification failed
+                return HttpResponse("Payment signature verification failed", status=400)
+        except Exception as e:
+            # Handle exceptions gracefully
+            return HttpResponse(f"An error occurred: {str(e)}", status=500)
+    else:
+        # Handle non-POST requests
+        return HttpResponse("Invalid request method", status=405)
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Medical
+from django.utils import timezone
+
+@login_required
+def medical_report(request):
+    # Get the currently logged-in user
+    current_user = request.user
+
+    # Retrieve the most recent medical record for the user
+    try:
+        medical_record = Medical.objects.filter(patient=current_user).latest('id')
+    except Medical.DoesNotExist:
+        medical_record = None
+
+    context = {
+        'current_user': current_user,
+        'medical_record': medical_record,
+        'current_datetime': timezone.now(),
+    }
+
+    return render(request, 'patient/report.html', context)
+
+
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.utils import timezone
+
+def generate_pdf(request, medical_record_id):
+    # Get the medical record data
+    medical_record = Medical.objects.get(id=medical_record_id)
+    
+    # Prepare the template context
+    context = {
+        'medical_record': medical_record,
+        'current_user': request.user,
+    }
+    
+    # Render the HTML template for the PDF
+    template = get_template('patient/medical_report_pdf.html')
+    html = template.render(context)
+    
+    # Create a PDF response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="medical_report.pdf"'
+
+    # Generate the PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+
+
+# views.py
+from .models import Payment
+
+def confirm_payment(request, appointment_id):
+    # Retrieve the appointment instance
+    appointment = Appointment.objects.get(pk=appointment_id)
+
+    # Create a payment for the appointment
+    payment = Payment.objects.create(
+        amount=200.00,  # Specify the payment amount
+        payment_method='razorpay',  # Specify the payment method
+        appointment=appointment
+    )
+
+    # Your payment confirmation logic here
+
+    return render(request, 'payment_success.html')
+
+
+import random
+from .models import Doctor
+
+def your_view(request):
+    # Get all active doctors
+    active_doctors = Doctor.objects.filter(is_active=True)
+
+    # Check if there are active doctors
+    if active_doctors:
+        # Select a random doctor from the list
+        random_doctor = random.choice(active_doctors)
+
+        # Pass the random_doctor to your template context
+        context = {'random_doctor': random_doctor}
+
+        return render(request, 'your_template.html', context)
+    else:
+        # Handle the case when there are no active doctors
+        return render(request, 'no_active_doctors_template.html')
+
+
+def payment_success(request):
+    return render (request,'patient/payment_success.html')

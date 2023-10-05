@@ -23,22 +23,47 @@ urlpatterns = [
     path('diagnosis/predict', views.MakePrediction, name='predict'),
     path('result/', views.patient_result, name='result'),
     path('result/ment', views.MakeAppointment, name='ment'),
-    path('ment', views.patient_appointment, name='ment_list'),
+    # path('ment', views.patient_appointment, name='ment_list'),
     path('doctor/', views.doctor_home, name='doctor'),
     path('recommend/', views.doctor_recommend, name='recommend'),
     path('recommend/predict', views.MakeMend, name='mend'),
-    path('meet', views.doctor_ment, name='meet_list'),
+    # path('meet', views.doctor_ment, name='meet_list'),
     path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
     path('patientinfo/', PatientListView.as_view(), name='patientinfo'),
     path('add_doctor', views.add_doctor, name='add_doctor'),
+    # path('appointment_success', views.appointment_success, name='appointment_success'),
     path('doctor_info/', views.doctor_info, name='doctor_info'),
-    path('edit_doctor/<int:doctor_id>/', views.edit_doctor, name='edit_doctor'),
-    path('delete_doctor/<int:doctor_id>/', views.delete_doctor, name='delete_doctor'),
     path('export_pdf/', views.export_pdf, name='export_pdf'),
     path('export_csv/', views.export_csv, name='export_csv'),
     path('home/', views.home, name='home'),  
     path('view_patient_info/', views.view_patient_info, name='view_patient_info'),
     path('book_appointment/<int:doctor_id>/', views.book_appointment, name='book_appointment'),
+    path('activate_doctor/<int:doctor_id>/', views.activate_doctor, name='activate_doctor'),
+    path('deactivate_doctor/<int:doctor_id>/', views.deactivate_doctor, name='deactivate_doctor'),
+    path('create_appointment/', views.create_appointment, name='create_appointment'),
+
+    path('doctor/appointments/', views.doctor_appointments, name='doctor_appointments'),
+    path('confirm_appointment/<int:appointment_id>/', views.confirm_appointment, name='confirm_appointment'),
+    path('complete_appointment/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
+
+    path('view_appointments/', views.view_appointments, name='view_appointments'),
+    path('appointments/', views.list_appointments, name='appointments'),
+    path('get_subcategories/', views.get_subcategories, name='get_subcategories'),
+
+    path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
+    # path('paymenthandler/payment_success/', views.payment_success, name='payment_success'),
+
+    path('appointment_success/', views.appointment_success, name='appointment_success'),
+
+    path('medical_report/', views.medical_report, name='medical_report'),
+
+    # path('generate_pdf/<int:medical_record_id>/', views.generate_pdf, name='generate_pdf'),
+    path('generate_pdf/<int:medical_record_id>/', views.generate_pdf, name='generate_pdf'),
+
+    path('payment_success/', views.payment_success, name='payment_success'),
+
+
+
 
     
 

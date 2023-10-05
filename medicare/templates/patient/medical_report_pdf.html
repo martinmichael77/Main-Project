@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    {% load static %}
+<head>
+    <meta charset="utf-8">
+    <title>Medical Report</title>
+    <style>
+        /* Add your PDF-specific styles here */
+        /* For example, you can define styles for the PDF content */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            max-width: 100px; /* Adjust the size of the logo as needed */
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .section p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo in the top-left corner -->
+    <img src="{% static 'core/img/logo.png' %}" alt="Logo" class="logo">
+    
+    <div class="header">
+        <h1>Medical Report</h1>
+    </div>
+    <div class="section">
+        <h2>Patient Information</h2>
+        <p><strong>Name:</strong> {{ current_user.get_full_name }}</p>
+        <p><strong>Date of Birth:</strong> {{ current_user.profile.birth_date|date:"F d, Y" }}</p>
+        <p><strong>Gender:</strong> {{ current_user.profile.gender }}</p>
+        <p><strong>Contact:</strong> {{ current_user.profile.phone_number }}</p>
+    </div>
+    <div class="section">
+        <h2>Symptoms</h2>
+        <ul>
+            <li><strong>Symptom 1:</strong> {{ medical_record.s1 }}</li>
+            <li><strong>Symptom 2:</strong> {{ medical_record.s2 }}</li>
+            <li><strong>Symptom 3:</strong> {{ medical_record.s3 }}</li>
+            <li><strong>Symptom 4:</strong> {{ medical_record.s4 }}</li>
+            <li><strong>Symptom 5:</strong> {{ medical_record.s5 }}</li>
+        </ul>
+    </div>
+    <div class="section">
+        <h2>Diagnosis</h2>
+        <p><strong>Diagnosis:</strong> {{ medical_record.disease }}</p>
+    </div>
+    <div class="section">
+        <h2>Recommended Treatment</h2>
+        <p><strong>Recommended Treatment:</strong> {{ medical_record.medicine }}</p>
+    </div>
+    <div class="section">
+        <h2>Consulting Doctor</h2>
+        <p><strong>Doctor:</strong> {{ medical_record.doctor.get_full_name }}</p>
+    </div>
+</body>
+</html>
