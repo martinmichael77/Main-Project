@@ -18,30 +18,41 @@
             <!-- ... Your existing icon cards ... -->
 
             <!-- Chart -->
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar"></i>
-                        Data Visualization
+            <!-- Chart -->
+            <div class="app-card-body p-4">
+                <div class="chart-container">
+                    <!-- First Row -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="barChart" width="400" height="250"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="barChart1" width="400" height="250"></canvas>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <canvas id="myChart"></canvas>
+                    <!-- Second Row -->
+                    {% comment %} <div class="row">
+                        <div class="col-md-12">
+                            <canvas id="paymentStatusPieChart" width="400" height="250"></canvas>
+                        </div> {% endcomment %}
                     </div>
                 </div>
             </div>
+            
+            <!--//col-->
+<!--//col-->
         </div>
     </div>
 </div>
 
-<!-- Include Chart.js library -->
-<script src="{% static 'core/js/Chart.min.js' %}"></script>
 
-<!-- Include Chart.js library -->
-<script src="{% static 'core/js/Chart.min.js' %}"></script>
+
+
+
 
 <script>
     // JavaScript code to populate data and create a chart
-    var ctx = document.getElementById('myChart').getContext('2d');
+    {% comment %} var ctx = document.getElementById('myChart').getContext('2d');
 
     var data = {
         labels: ["Drugs", "Patients", "Appointments", "Doctors"],
@@ -83,7 +94,125 @@
         type: 'bar',
         data: data,
         options: options
+    }); {% endcomment %}
+
+
+        // Function to fetch monthly appointment counts data via AJAX
+        function fetchMonthlyAppointmentData() {
+            // Make an AJAX request to your Django view URL
+            // Replace 'your_view_url' with the actual URL of your Django view
+            fetch('/monthly_appointment_counts/')
+                .then(response => response.json())
+                .then(data => createBarChart(data.monthly_counts))
+                .catch(error => console.error('Error:', error));
+        }
+    
+        // Function to create the bar chart using Chart.js
+        function createBarChart(monthlyCounts) {
+            const ctx = document.getElementById('barChart').getContext('2d');
+    
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyCounts.map(entry => entry.month), // Month labels
+                    datasets: [{
+                        label: 'Monthly Appointments',
+                        data: monthlyCounts.map(entry => entry.total_appointments), // Monthly appointment counts
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)', // Bar color
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Appointments'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    
+        // Call the fetchMonthlyAppointmentData function to fetch and create the bar chart
+        fetchMonthlyAppointmentData();
+
+    
+</script>
+<script>
+    // Get the data from your Django view (example data)
+    var labels = ["Disease 1", "Disease 2", "Disease 3"];
+    var counts = [15, 10, 5];
+
+    var ctx = document.getElementById('barChart1').getContext('2d');
+
+    // Create the bar chart
+    var barChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Disease Count',
+                data: counts,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Bar color
+                borderColor: 'rgba(75, 192, 192, 1)', // Border color
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
 </script>
+<script>
+    // Function to fetch payment status data via AJAX
+    function fetchPaymentStatusData() {
+        fetch('/payment_status_pie_chart/')
+            .then(response => response.json())
+            .then(data => createPaymentStatusPieChart(data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Function to create the pie chart using Chart.js
+    function createPaymentStatusPieChart(data) {
+        const ctx = document.getElementById('paymentStatusPieChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.labels,  // Payment statuses
+                datasets: [{
+                    data: data.counts,  // Counts
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        // Add more colors as needed
+                    ],
+                }],
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    }
+
+    // Call the fetchPaymentStatusData function to fetch and create the pie chart
+    fetchPaymentStatusData();
+</script>
+
 
 {% endblock %}

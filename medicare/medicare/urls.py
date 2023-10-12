@@ -41,31 +41,25 @@ urlpatterns = [
     path('activate_doctor/<int:doctor_id>/', views.activate_doctor, name='activate_doctor'),
     path('deactivate_doctor/<int:doctor_id>/', views.deactivate_doctor, name='deactivate_doctor'),
     path('create_appointment/', views.create_appointment, name='create_appointment'),
-
     path('doctor/appointments/', views.doctor_appointments, name='doctor_appointments'),
     path('confirm_appointment/<int:appointment_id>/', views.confirm_appointment, name='confirm_appointment'),
     path('complete_appointment/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
-
     path('view_appointments/', views.view_appointments, name='view_appointments'),
     path('appointments/', views.list_appointments, name='appointments'),
     path('get_subcategories/', views.get_subcategories, name='get_subcategories'),
-
     path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
     # path('paymenthandler/payment_success/', views.payment_success, name='payment_success'),
-
     path('appointment_success/', views.appointment_success, name='appointment_success'),
-
     path('medical_report/', views.medical_report, name='medical_report'),
-
     # path('generate_pdf/<int:medical_record_id>/', views.generate_pdf, name='generate_pdf'),
     path('generate_pdf/<int:medical_record_id>/', views.generate_pdf, name='generate_pdf'),
-
     path('payment_success/', views.payment_success, name='payment_success'),
+    # path('api/data/', views.chart_data, name='chart_data'),
 
 
 
-
-    
+    path('monthly_appointment_counts/', views.monthly_appointment_counts, name='monthly_appointment_counts'),
+    # path('payment_status_pie_chart/', views.payment_status_pie_chart, name='payment_status_pie_chart'),
 
 
 

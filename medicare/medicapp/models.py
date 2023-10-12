@@ -113,7 +113,7 @@ class Payment(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default=1)
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='Pending')
     payment_date = models.DateTimeField(auto_now_add=True, null=True)  # Use auto_now_add=True for initial creation
 
 

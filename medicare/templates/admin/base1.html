@@ -7,6 +7,7 @@
     <link href="{% static 'core/css/sb-admin.css' %}" rel="stylesheet">
 
     <link href="{% static 'core/css/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -66,21 +67,22 @@
             <span>Logged As {{ user.username }}</span>
         </a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item" id="patient-info-link">
         <a class="nav-link" href="{% url "patientinfo" %}">
             <i class="fas fa-medkit text-primary"></i>
             <span style="color: white">Patient Info</span>
         </a>
     </li>
+    
 
-    <li class="nav-item">
+    <li class="nav-item" id="add-doc">
         <a class="nav-link" href="{% url "add_doctor" %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">Add Doctor</span>
         </a>
     </li>
 
-    <li class="nav-item">
+    <li class="nav-item" id="doc-info">
         <a class="nav-link" href="{% url "doctor_info" %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">Doctor Info</span>
@@ -88,7 +90,7 @@
     </li>
    
 
-<li class="nav-item">
+<li class="nav-item" id="appoint">
     <a class="nav-link" href="{% url "appointments" %}">
         <i class="fas fa-calendar text-primary"></i>
         <span style="color: white">Appointments List</span>

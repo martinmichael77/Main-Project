@@ -579,7 +579,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 def book_appointment(request, doctor_id):
-    doctor = get_object_or_404(Doctor, pk=doctor_id)
+    doctor = get_object_or_404(Doctor, pk=doctor_id,is_active=True)
     
     if request.method == 'POST':
         # Get the data from the POST request
@@ -588,7 +588,7 @@ def book_appointment(request, doctor_id):
         patient = request.user  # Assuming the patient is the currently logged-in user
         specialization = request.POST.get('id_specialization')
         selected_doctor_id = request.POST.get('id_doctor')
-        selected_doctor = get_object_or_404(Doctor, pk=selected_doctor_id)
+        selected_doctor = get_object_or_404(Doctor, pk=selected_doctor_id,is_active=True)
         
         # Create and save the appointment
         appointment = Appointment(
@@ -606,11 +606,6 @@ def book_appointment(request, doctor_id):
     else:
         # Render the initial HTML form
         return render(request, 'patient/appointments.html', {'doctor': doctor})
-
-
-
-
-from django.shortcuts import render
 
 
 
@@ -817,28 +812,47 @@ razorpay_client = razorpay.Client(
 
 
 
+from django.shortcuts import render
+from django.conf import settings
+from razorpay import Client as RazorpayClient
+from .models import Appointment, Payment
+
+
 def appointment_success(request):
+    # Retrieve the appointment instance
+
     currency = 'INR'
-    amount = 20000  # Rs. 200
- 
+    amount = int(200*100)  # Rs. 200
+
     # Create a Razorpay Order
-    razorpay_order = razorpay_client.order.create(dict(amount=amount,
-                                                       currency=currency,
-                                                       payment_capture='0'))
- 
-    # order id of newly created order.
+    razorpay_order = razorpay_client.order.create(dict(
+        amount=amount,
+        currency=currency,
+        payment_capture='0'
+    ))
+
+    # order id of the newly created order
     razorpay_order_id = razorpay_order['id']
     callback_url = '/paymenthandler/'
- 
-    # we need to pass these details to frontend.
-    context = {}
-    context['razorpay_order_id'] = razorpay_order_id
-    context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
-    context['razorpay_amount'] = amount
-    context['currency'] = currency
-    context['callback_url'] = callback_url
- 
-    return render(request, 'patient/appointment_success.html',context=context)
+
+    # Create a Payment for the appointment
+    payment = Payment.objects.create(
+        user=request.user,
+        payment_amount=amount,  # Specify the payment amount
+        payment_status='Pending',  # Set payment status to "Pending"
+    )
+
+    # Render the success template with the necessary context
+    context = {
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,
+        'currency': currency,
+        'callback_url': callback_url
+    }
+
+    return render(request, 'patient/appointment_success.html', context=context)
+
 
 @csrf_exempt
 def paymenthandler(request):
@@ -848,17 +862,19 @@ def paymenthandler(request):
             payment_id = request.POST.get('razorpay_payment_id', '')
             razorpay_order_id = request.POST.get('razorpay_order_id', '')
             signature = request.POST.get('razorpay_signature', '')
+            amount=request.POST.get('razorpay_amount', '')
 
             # Verify the payment signature
             params_dict = {
                 'razorpay_order_id': razorpay_order_id,
                 'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
+                'razorpay_signature': signature,
+
             }
             result = razorpay_client.utility.verify_payment_signature(params_dict)
 
             if result is not None:
-                amount = 20000  # Rs. 200
+                amount = int(200*100)  # Rs. 200
 
                 # Capture the payment
                 razorpay_client.payment.capture(payment_id, amount)
@@ -882,6 +898,24 @@ def paymenthandler(request):
     else:
         # Handle non-POST requests
         return HttpResponse("Invalid request method", status=405)
+
+from .models import Payment
+
+def confirm_payment(request, appointment_id):
+    # Retrieve the appointment instance
+    appointment = Appointment.objects.get(pk=appointment_id)
+    payment = Payment.objects.create(payment_status='Pending')
+
+    # Create a payment for the appointment
+    payment = Payment.objects.create(
+        user=request.user,
+        payment_amount=200.00,  # Specify the payment amount
+        payment_status='Pending',  # Set payment status to "Pending"
+    )
+
+    # Your payment confirmation logic here
+
+    return render(request, 'payment_success.html')
 
 
 from django.shortcuts import render
@@ -942,22 +976,6 @@ def generate_pdf(request, medical_record_id):
 
 
 # views.py
-from .models import Payment
-
-def confirm_payment(request, appointment_id):
-    # Retrieve the appointment instance
-    appointment = Appointment.objects.get(pk=appointment_id)
-
-    # Create a payment for the appointment
-    payment = Payment.objects.create(
-        amount=200.00,  # Specify the payment amount
-        payment_method='razorpay',  # Specify the payment method
-        appointment=appointment
-    )
-
-    # Your payment confirmation logic here
-
-    return render(request, 'payment_success.html')
 
 
 import random
@@ -983,3 +1001,119 @@ def your_view(request):
 
 def payment_success(request):
     return render (request,'patient/payment_success.html')
+
+
+
+# from django.http import JsonResponse
+
+# def chart_data(request):
+#     # Retrieve data from your models, process it, and prepare it for the charts
+#     data = {
+#         "drug": 10,
+#         "patient": 50,
+#         "appointment": 30,
+#         "doctor": 5,
+#         "male_patient_count": 35,
+#         "female_patient_count": 15,
+#     }
+#     return JsonResponse(data)
+
+
+
+#CHARTS
+from django.http import JsonResponse
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth
+from .models import Appointment
+
+def monthly_appointment_counts(request):
+    # Filter appointments with 'confirmed' and 'completed' statuses
+    appointments = Appointment.objects.filter(status__in=['confirmed', 'completed'])
+
+    # Group appointments by month and count them
+    monthly_counts = appointments.annotate(
+        month=ExtractMonth('date')
+    ).values(
+        'month'
+    ).annotate(
+        total_appointments=Count('id')
+    ).order_by(
+        'month'
+    )
+
+    # Convert the result to a list of dictionaries
+    result = [{'month': entry['month'], 'total_appointments': entry['total_appointments']} for entry in monthly_counts]
+
+    return JsonResponse({'monthly_counts': result})
+
+
+# views.py
+from django.http import JsonResponse
+from django.db.models import Count  # Import Count
+from matplotlib.figure import Figure
+from io import BytesIO
+import base64
+import matplotlib.pyplot as plt
+from .models import Medical
+
+def disease_distribution_chart(request):
+    # Retrieve data for disease distribution
+    diseases = Medical.objects.values('disease').annotate(count=Count('id'))  # Use Count
+
+    labels = [disease['disease'] for disease in diseases]
+    counts = [disease['count'] for disease in diseases]
+
+    # Create a pie chart
+    fig, ax = plt.subplots()
+    ax.pie(counts, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that the pie is drawn as a circle.
+
+    # Convert the chart to an image
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    chart_image = base64.b64encode(buffer.read()).decode()
+
+    # Prepare JSON response
+    data = {
+        'chart_image': chart_image,
+        'labels': labels,
+        'counts': counts,
+    }
+
+    return JsonResponse(data)
+
+
+# import json
+# import matplotlib.pyplot as plt
+# from io import BytesIO
+# import base64
+# from django.http import JsonResponse
+# from .models import Payment  # Import your Payment model
+
+# def payment_status_pie_chart(request):
+#     # Retrieve data for payment status distribution
+#     payment_statuses = Payment.objects.values('payment_status').annotate(count=Count('id'))
+
+#     labels = [status['payment_status'] for status in payment_statuses]
+#     counts = [status['count'] for status in payment_statuses]
+
+#     # Create a pie chart
+#     fig, ax = plt.subplots()
+#     ax.pie(counts, labels=labels, autopct='%1.1f%%', startangle=90)
+#     ax.axis('equal')
+
+#     # Convert the chart to an image
+#     buffer = BytesIO()
+#     plt.savefig(buffer, format='png')
+#     buffer.seek(0)
+#     chart_image = base64.b64encode(buffer.read()).decode()
+
+#     # Prepare JSON response
+#     data = {
+#         'chart_image': chart_image,
+#         'labels': labels,
+#         'counts': counts,
+#     }
+
+#     return JsonResponse(data)
