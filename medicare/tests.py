@@ -8,7 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 
-
 class Hosttest(TestCase):
     
     def setUp(self):
@@ -18,8 +17,6 @@ class Hosttest(TestCase):
 
     def tearDown(self):
         self.driver.quit()
-
-    
 
     def test_01_login_page(self):
         driver = self.driver
