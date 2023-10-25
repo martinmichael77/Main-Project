@@ -758,8 +758,14 @@ from .models import Appointment
 
 def view_appointments(request):
     user_appointments = Appointment.objects.filter(patient=request.user)
+    context = {'ment': user_appointments,'status':'1'}
+    return render(request, 'patient/view_appointment.html', context)
 
-    return render(request, 'patient/view_appointment.html', {'ment': user_appointments})
+# def patient_result(request):
+#     userid = request.user.id
+#     disease = Medical.objects.all().filter(patient_id=userid)
+#     context = {'disease':disease,'status':'1'}
+#     return render(request,'patient/result.html',context)
 
 
 #LIST APPOINTMENTS @ADMIN SIDE
@@ -931,6 +937,7 @@ def medical_report(request):
     # Retrieve the most recent medical record for the user
     try:
         medical_record = Medical.objects.filter(patient=current_user).latest('id')
+        
     except Medical.DoesNotExist:
         medical_record = None
 
@@ -938,6 +945,7 @@ def medical_report(request):
         'current_user': current_user,
         'medical_record': medical_record,
         'current_datetime': timezone.now(),
+        'status':'1'
     }
 
     return render(request, 'patient/report.html', context)
@@ -1000,7 +1008,8 @@ def your_view(request):
 
 
 def payment_success(request):
-    return render (request,'patient/payment_success.html')
+    context = {'status':'1'}
+    return render (request,'patient/payment_success.html',context)
 
 
 

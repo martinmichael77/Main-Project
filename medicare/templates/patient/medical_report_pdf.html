@@ -1,72 +1,111 @@
 <!DOCTYPE html>
 <html>
-    {% load static %}
+
 <head>
-    <meta charset="utf-8">
-    <title>Medical Report</title>
-    <style>
-        /* Add your PDF-specific styles here */
-        /* For example, you can define styles for the PDF content */
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo {
-            position: absolute;
-            top: 0;
-            left: 0;
-            max-width: 100px; /* Adjust the size of the logo as needed */
-        }
-        .section {
-            margin-bottom: 20px;
-        }
-        .section h2 {
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .section p {
-            font-size: 14px;
-        }
-    </style>
+  {% load static %}
+  <meta charset="utf-8">
+  <title>Medical Report</title>
+  
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif; 
+    }
+
+    .header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      max-width: 100px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: 1px solid #007bff;
+      padding-bottom: 10px;
+      margin-bottom: 20px; 
+    }
+  </style>
+  
 </head>
+
 <body>
-    <!-- Logo in the top-left corner -->
-    <img src="{% static 'core/img/logo.png' %}" alt="Logo" class="logo">
-    
+
+  <!-- Logo -->
+  <img src="{% static 'img/logo.png' %}" class="logo">
+
+  <div class="container">
+
     <div class="header">
-        <h1>Medical Report</h1>
+      <h1>Medical Report</h1>
     </div>
-    <div class="section">
+
+    <!-- Patient Info -->
+    <div class="row section">
+      <div class="col-md-6">
         <h2>Patient Information</h2>
-        <p><strong>Name:</strong> {{ current_user.get_full_name }}</p>
-        <p><strong>Date of Birth:</strong> {{ current_user.profile.birth_date|date:"F d, Y" }}</p>
+        <p><strong>Name:</strong> {{ current_user.get_full_name }}</p> 
+        <p><strong>DOB:</strong> {{ current_user.profile.birth_date|date:"F d, Y" }}</p>
+      </div>
+
+      <div class="col-md-6">
         <p><strong>Gender:</strong> {{ current_user.profile.gender }}</p>
-        <p><strong>Contact:</strong> {{ current_user.profile.phone_number }}</p>
+        <p><strong>Contact:</strong> {{ current_user.profile.phone_number }}</p>  
+      </div>
     </div>
-    <div class="section">
+
+    <!-- Symptoms -->
+    <div class="row section">
+      <div class="col-md-12">
         <h2>Symptoms</h2>
-        <ul>
-            <li><strong>Symptom 1:</strong> {{ medical_record.s1 }}</li>
-            <li><strong>Symptom 2:</strong> {{ medical_record.s2 }}</li>
-            <li><strong>Symptom 3:</strong> {{ medical_record.s3 }}</li>
-            <li><strong>Symptom 4:</strong> {{ medical_record.s4 }}</li>
-            <li><strong>Symptom 5:</strong> {{ medical_record.s5 }}</li>
+        <ul class="list-unstyled">
+          <li><strong>Symptom 1:</strong> {{ medical_record.s1 }}</li>
+          <li><strong>Symptom 2:</strong> {{ medical_record.s2 }}</li>
+          <li><strong>Symptom 3:</strong> {{ medical_record.s3 }}</li>
+          <li><strong>Symptom 4:</strong> {{ medical_record.s4 }}</li>
+          <li><strong>Symptom 5:</strong> {{ medical_record.s5 }}</li>
         </ul>
+      </div>
     </div>
-    <div class="section">
+
+    <!-- Diagnosis -->
+    <div class="row section">
+      <div class="col-md-12">
         <h2>Diagnosis</h2>
         <p><strong>Diagnosis:</strong> {{ medical_record.disease }}</p>
+      </div>
     </div>
-    <div class="section">
+
+    <!-- Treatment -->
+    <div class="row section">
+      <div class="col-md-12">
         <h2>Recommended Treatment</h2>
-        <p><strong>Recommended Treatment:</strong> {{ medical_record.medicine }}</p>
+        <p><strong>Treatment:</strong> {{ medical_record.medicine }}</p>
+      </div>  
     </div>
-    <div class="section">
+
+    <!-- Doctor -->
+    {% comment %} <div class="row section">
+      <div class="col-md-12">
         <h2>Consulting Doctor</h2>
         <p><strong>Doctor:</strong> {{ medical_record.doctor.get_full_name }}</p>
-    </div>
+      </div>
+    </div> {% endcomment %}
+
+  </div>
+
 </body>
-</html>
+</html> 

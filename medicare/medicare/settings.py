@@ -182,3 +182,24 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use the appropriate template pack (e.g., 
 
 RAZOR_KEY_ID = 'rzp_test_xfrnYSFQFDBO1w'
 RAZOR_KEY_SECRET = 'Md6mU2L9gPD18FUtXhm8nRim'
+
+# JAZZMIN_SETTINGS = {
+#     "site_title": "Your Admin Panel",
+#     "site_header": "Your Admin Panel",
+#     "site_url": "/admin/",
+#     "navigation_expanded": False,
+#     "search_bar": False,
+#     "hide_apps": [],
+#     "hide_models": [],
+#     "order_with_respect_to": [],
+#     "custom_links": {
+#         "Example link": "https://example.com",
+#     },
+#     "actions_exclude": [],
+#     "actions_include": [],
+#     "structure_template_with_guards": "{% if request.user.is_superuser %}jazzmin/includes/side_nav_links.html{% endif %}",
+#     "home_link": False,
+#     "default_icon_parents": "fas",
+#     "default_icon_children": "fas",
+#     "related_modal_active": False,
+# }

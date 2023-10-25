@@ -55,10 +55,10 @@
                             <p>{{ medical_record.medicine }}</p>
                         </div>
 
-                        <div class="report-section">
+                        {% comment %} <div class="report-section">
                             <h2 class="mb-3">Consulting Doctor</h2>
-                            <p><strong>Doctor:</strong> {{ medical_record.doctor.get_full_name }}</p>
-                        </div>
+                            <p><strong>Doctor:</strong> {{ medical_record.appointment.doctor }}</p>
+                        </div> {% endcomment %}
                         {% else %}
                         <p>No medical record found for {{ current_user.get_full_name }}.</p>
                         {% endif %}
