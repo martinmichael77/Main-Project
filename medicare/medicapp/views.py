@@ -13,7 +13,9 @@ from django.shortcuts import render
 from medicapp.forms import UserProfileForm
 from django.shortcuts import get_object_or_404
 from medicapp.models import Treatment
+from django.contrib.auth import login as auth_login
 
+from math import radians,sin,cos,sqrt,atan2
 
 #REGISTRATOIN
 def register(request):
@@ -557,7 +559,7 @@ def user_profile(request):
 
 
 #VIEW PATIENT INFO
-from django.shortcuts import render
+from django.shortcuts import render 
 from .models import Medical
 
 def view_patient_info(request):
@@ -1126,3 +1128,254 @@ def disease_distribution_chart(request):
 #     }
 
 #     return JsonResponse(data)
+
+# medicapp/views.py
+from django.shortcuts import render, redirect
+from medicapp.models import PrescriptionRefill
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Treatment, PrescriptionRefill
+
+@login_required
+def refill_request_view(request, username):
+    # Ensure that the provided username matches the currently logged-in user
+    user_treatments = Treatment.objects.filter(patient=request.user)
+
+    return render(request, 'patient/refill_request_form.html', {'user_treatments': user_treatments})
+
+
+# Assuming you have a model called Counselor in your models.py
+# from django.shortcuts import render, redirect
+# from django.views import View
+# from django.contrib import messages
+# from .models import Counselor
+
+# class AddCounselorView(View):
+#     template_name = 'admin/add_counselor.html'  # Path to your HTML template
+
+#     def get(self, request):
+#         return render(request, self.template_name)
+
+#     def post(self, request):
+#         # Retrieve data from the submitted form
+#         first_name = request.POST.get('first_name')
+#         last_name = request.POST.get('last_name')
+#         email = request.POST.get('email')
+
+#         # Validate the data (you can use Django forms for more complex validation)
+#         if not (first_name and last_name and email):
+#             messages.error(request, 'All fields are required.')
+#             return redirect('add_counselor')  # Redirect to the same page in case of errors
+
+#         # Save the counselor to the database
+#         counselor = Counselor.objects.create(
+#             first_name=first_name,
+#             last_name=last_name,
+#             email=email,
+#             # Add other fields as needed
+#         )
+
+#         messages.success(request, 'Counselor added successfully.')
+#         return redirect('add_counselor')  # Redirect to the same page after successful submission
+
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+from .models import Counselor
+
+def add_counselor(request):
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email = request.POST['email']
+
+        existing_user = User.objects.filter(username=email).first()
+
+        if existing_user:
+            messages.error(request, 'User with this email already exists')
+        else:
+            # Create a new user
+            user = User.objects.create_user(
+                username=email,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+            )
+
+            # Create a new Counselor
+            counselor = Counselor(
+                user=user,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+            )
+            counselor.save()
+
+            # Set the default password for the user
+            default_password = "Counselor@Medicare"
+            user.set_password(default_password)
+            user.save()
+
+            messages.success(request, 'Counselor added successfully. Login credentials sent to the email.')
+
+            # You might want to send an email to the counselor here
+
+    return render(request, 'admin/add_counselor.html', context={'messages': messages.get_messages(request)})
+
+
+
+# views.py
+from django.shortcuts import render
+from .models import Counselor
+
+def counselor_list(request):
+    counselors = Counselor.objects.all()
+    return render(request, 'admin/counselorinfo.html', {'counselors': counselors})
+
+def login_counselor(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Check if the email exists in the Counselor model
+        try:
+            counselor = Counselor.objects.get(email=email)
+        except Counselor.DoesNotExist:
+            counselor = None
+
+        if counselor is not None and counselor.user.check_password(password):
+            # Login the user and redirect to a success page
+            auth_login(request, counselor.user)
+            return redirect('base_counselor')
+        else:
+            messages.error(request, 'Invalid email or password')
+
+    return render(request, 'counselor/login_counselor.html')
+
+def base_counselor(request):
+    return render(request, 'counselor/base_counselor.html')
+
+def home_counselor(request):
+    return render(request, 'counselor/home_counselor.html')
+
+def patient_counselling(request):
+    return render(request, 'patient/patient_counselling.html')
+
+# views.py
+
+from django.shortcuts import render, redirect
+from .models import Hospital
+
+def add_hospital(request):
+    if request.method == 'POST':
+        # Extract data from the form
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        contact = request.POST.get('contact')
+        address = request.POST.get('address')
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        opening_time = request.POST.get('opening_time')
+        closing_time = request.POST.get('closing_time')
+        opening_days = request.POST.get('opening_days')
+        hospital_image = request.FILES.get('hospital_image')
+        avgrating = request.POST.get('avgrating')
+
+        # Create a new Hospital object and save it to the database
+        hospital = Hospital.objects.create(
+            name=name,
+            email=email,
+            city=city,
+            state=state,
+            country=country,
+            contact=contact,
+            address=address,
+            latitude=latitude,
+            longitude=longitude,
+            opening_time=opening_time,
+            closing_time=closing_time,
+            opening_days=opening_days,
+            hospital_image=hospital_image,
+            avgrating=avgrating
+        )
+        
+        # Redirect to a success page or any other desired URL
+        return redirect('home')  # Change 'home' to the appropriate URL
+
+    return render(request, 'admin/add_hospital.html')
+
+# def login_counselor(request):
+#     # Your logic for counselor login goes here
+#     return render(request, 'counselor/login_counselor.html')
+
+
+
+from math import radians,sin,cos,sqrt,atan2
+from .models import UserSellerDistance
+
+def nearby_hospital(request):
+    user_profile = Profile.objects.get(user=request.user)
+    sellers = Hospital.objects.all()
+    nearby_sellers = []
+
+    if request.method == 'POST':
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+
+        if latitude is not None and longitude is not None:
+            user_profile.latitude = float(latitude)  # Convert to float
+            user_profile.longitude = float(longitude)  # Convert to float
+            user_profile.save()
+
+    latitude = user_profile.latitude
+    longitude = user_profile.longitude
+    
+    for seller in sellers:
+        if latitude is not None and longitude is not None:
+            # Calculate distance for each seller using haversine
+            distance = haversine(float(seller.latitude), float(seller.longitude), user_profile.latitude, user_profile.longitude)  # Convert seller coordinates to float
+            
+            UserSellerDistance.objects.update_or_create(
+                user=request.user,
+                hospital=seller,
+                defaults={'distance': distance}
+            )
+        
+    userseller = UserSellerDistance.objects.filter(user=request.user)
+    nearby_sellers = userseller.filter(
+        distance__isnull=False,
+        user=request.user,
+    ).order_by('distance')
+
+    context = {
+        'nearby_sellers': nearby_sellers,
+    }
+
+    return render(request, 'patient/nearbyhospital.html', context)
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    # Helper function to convert coordinate to float, treating None as 0.0
+    def convert_coord(coord):
+        return float(coord) if coord is not None else 0.0
+      
+    # Convert latitude and longitude to radians
+    lat1, lon1, lat2, lon2 = map(convert_coord, [lat1, lon1, lat2, lon2])  # Fixed here
+    
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = 6371.0 * c  # Radius of Earth in kilometers
+
+    return distance
+
+def view_hospital(request):
+    seller=Hospital.objects.all
+    return render(request, 'admin/view_hospital.html',{'seller':seller})

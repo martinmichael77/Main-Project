@@ -1,0 +1,192 @@
+{% extends 'patient/base.html' %}
+{% load static %}
+{% load humanize %} {# Load humanize for naturaltime filter #}
+
+{% block body %}
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    
+
+                    <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?callback=loadMapScenario&key=Agyr0UQGWTFzP3Fwb3PDJ_ahP24jx9jRgpUWwBD_37B8MXu1oql6WCs6J-vgU1YT"></script>
+                
+    
+    <div class="container-xxl py-5">
+      <div class="container">        
+        <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s">
+            <p class="fs-5 fw-medium fst-italic text-primary">Explore Hospitals near you</p>
+            <h2 class="display-8">Your Perfect Healthcare Solution</h2>  
+        </div>
+      
+          {% comment %} {{ user.profile.latitude}}
+          {{ user.profile.longitude}} {% endcomment %}
+            <div class="row g-4 wow fadeInUp" >
+              <button id="changelocation-button" style="background: none; border: none; color: #9abf69; text-decoration: none; margin-left:20px; cursor: pointer;">
+                {% if user.profile.latitude is not None and user.profile.longitude is not None and user.profile.latitude|default:0.0 != 0.0 and user.profile.longitude|default:0.0 != 0.0 %}
+                  Change Location
+                {% else %}
+                  Add Location
+                {% endif %}
+              </button>     
+            </div>
+              <form id="location-section" class="row g-4" style="display: none; margin-top:10px;"  method="post" >     
+              {% csrf_token %}                 
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                  <div class="form-group">
+                    {% if user.profile.latitude and user.profile.longitude %}
+                        <input class="form-control text animated zoomIn" value="{{ user.profile.latitude }}" type="text" id="lat"  class="cardelement" placeholder="Latitude" name="latitude" required>
+                    {% else %}
+                        <input class="form-control text animated zoomIn" type="text" id="lat"  class="cardelement" placeholder="Latitude" name="latitude" required>
+                    {% endif %}
+                        <span id="latspan"></span>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">   
+                  <div class="form-group">
+                      {% if user.profile.latitude and user.profile.longitude %}
+                        <input class="form-control text animated zoomIn" value="{{ user.profile.longitude }}" type="text" id="long"  name="longitude" placeholder="Longitude"class="cardelement" required>
+                      {% else %}
+                        <input class="form-control text animated zoomIn"type="text" id="long"  name="longitude" placeholder="Longitude"class="cardelement" required>
+                      {% endif %}
+                      <span id="longspan"></span>
+                  </div>
+                </div>  
+                <div class="col-lg-2 col-md-6 wow fadeInUp" data-wow-delay="0.1s">  
+                  <button onclick="getCoordinates()" style="background: none; border: none; text-decoration: none; margin-left:20px; cursor: pointer;">
+                    Get Coordinates
+                  </button> 
+                </div>
+                <div class="col-lg-2 col-md-6 wow fadeInUp" data-wow-delay="0.1s">  
+                  <button  class="btn btn-dark rounded-pill py-2 px-6 " style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;" type="submit" id="signinbtn">Save Location</button>
+                </div>
+              </form> 
+
+        {% if user.profile.latitude is not None and user.profile.longitude is not None and user.profile.latitude|default:0.0 != 0.0 and user.profile.longitude|default:0.0 != 0.0 %}
+        <div class="row g-4" style="margin-top:30px;">
+          {% for seller in nearby_sellers %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+              <div class="store-item position-relative text-center">
+                <img src="{{ seller.hospital.hospital_image.url }}" alt="{{ seller.hospital.name }}" class="img-fluid" style="height:200px;">                      
+                <div class="p-4">
+                  <h5 class="mb-3 text-primary">{{ seller.hospital.name }}</h5> 
+                  <div class="text-center mb-3">
+                  </div>
+                  <p class="mb-3"><i class="bi bi-telephone text-primary" style="margin-right:10px;"></i>{{ seller.hospital.contact }}</p>
+                  <p class="mb-3"><i class="bi bi-geo text-primary" style="margin-right:10px;"></i>{{ seller.hospital.address }}</p>
+                  <p class="mb-3"><strong>Distance:</strong> {{ seller.distance }} km</p> <!-- Display distance here -->
+
+                </div>
+                <div class="store-overlay">
+                  <!-- Additional information or actions can be added here if needed -->
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+          
+        {% else %}
+                 
+        {% endif %}
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#changelocation-button").click(function() {
+            // Check the current display state of the reviews section
+            var locationSection = $("#location-section");
+            var isDisplayed = locationSection.is(":visible");
+      
+            // Toggle the display state (show if hidden, hide if shown)
+            locationSection.toggle();
+      
+            // If the section was hidden, make an AJAX request to load the reviews
+           
+        });
+      });
+      
+        function getCoordinates() {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+              alert("Geolocation is not supported by this browser.");
+            }
+          }
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+          
+            // Populate the latitude and longitude input fields with the obtained values
+            document.getElementById('lat').value = latitude;
+            document.getElementById('long').value = longitude;
+          }
+    </script>
+{% endblock %}
+<style>
+.cardelement
+    {
+        border-color: #27350F;
+        background-color: white;
+        border-style:solid;
+        border-width: 1px;
+        
+        width: 250px;
+        height: 40px;
+        padding: 10px;
+    }
+
+
+.cardelement:focus {
+   
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+  }
+  
+.cardelement:hover {
+    border-color: darkgreen;
+  background-color: white;
+  border-style: hidden;
+  fill: darkgreen;
+  }
+  
+.carde
+{
+    
+    color:#27350F; 
+    margin-top: 20px;
+}
+
+</style>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom CSS styles */
+    .card {
+        border: 2px solid #17a2b8;
+        border-radius: 10px;
+    }
+
+    .text-primary {
+        color: #17a2b8;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .list-group-item {
+        background-color: #f8f9fa;
+    }
+</style>
+
+

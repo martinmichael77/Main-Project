@@ -1,0 +1,58 @@
+{% extends 'patient/base.html' %}
+{% load static %}
+{% load humanize %} {# Load humanize for naturaltime filter #}
+
+{% block body %}
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="container">
+                            <div class="header">
+                                <h1>Prescription Refill Request</h1>
+                            </div>
+                            {% if user_treatments %}
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Treatment ID</th>
+                                            <th>Approved</th>
+                                            <th>Time</th>
+                                            <th>Doctor</th>
+                                            <th>Treatment Day</th>
+                                            <th>Medical</th>
+                                            <th>Created On</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for treatment in user_treatments %}
+                                            <tr>
+                                                <td>{{ treatment.id }}</td>
+                                                <td>{{ treatment.approved }}</td>
+                                                <td>{{ treatment.time }}</td>
+                                                <td>{{ treatment.doctor.get_full_name }}</td>
+                                                <td>{{ treatment.treatment_day }}</td>
+                                                <td>{{ treatment.medical }}</td>
+                                                <td>{{ treatment.created_on }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No treatments available.</p>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">Submit Refill Request</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

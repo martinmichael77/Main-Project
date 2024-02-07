@@ -60,6 +60,17 @@ urlpatterns = [
 
     path('monthly_appointment_counts/', views.monthly_appointment_counts, name='monthly_appointment_counts'),
     # path('payment_status_pie_chart/', views.payment_status_pie_chart, name='payment_status_pie_chart'),
+    path('refill_request_view/<str:username>/', views.refill_request_view, name='refill_request_view'),
+
+    path('add_counselor/', views.add_counselor, name='add_counselor'),
+    path('counselorinfo', views.counselor_list, name='counselorinfo'),
+    path('login_counselor/', views.login_counselor, name='login_counselor'),
+    path('base_counselor', views.base_counselor, name='base_counselor'),
+    path('home_counselor', views.home_counselor, name='home_counselor'),
+    path('patient_counselling', views.patient_counselling, name='patient_counselling'),
+    path('add_hospital/', views.add_hospital, name='add_hospital'),
+    path('nearby_hospital', views.nearby_hospital, name='nearby_hospital'),
+    path('view_hospital', views.view_hospital, name='view_hospital'),
 
 
 

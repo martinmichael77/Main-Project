@@ -75,5 +75,3 @@ from .models import Appointment
 
 
 
-
-

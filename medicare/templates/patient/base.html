@@ -79,7 +79,25 @@
                 <span style="color: white">Medical Report</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{% url 'refill_request_view' user.username %}">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Prescription Refill</span>
+            </a>
+        </li>
         
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "patient_counselling" %} ">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Counseling</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "nearby_hospital" %} ">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Hospital Search</span>
+            </a>
+        </li>
         {% else %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'create_profile' %}">

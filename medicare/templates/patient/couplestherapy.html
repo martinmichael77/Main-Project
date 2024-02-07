@@ -1,0 +1,97 @@
+{% extends 'patient/couplestherapy.html' %}
+{% load static %}
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <!DOCTYPE html>
+        <html lang="en-US" dir="ltr">
+
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Couples Therapy</title>
+            <link rel="apple-touch-icon" sizes="180x180" href="">
+            <link rel="icon" type="image/png" sizes="32x32" href="">
+            <link rel="icon" type="image/png" sizes="16x16" href="">
+            <link rel="shortcut-icon" type="image/x-icon" href="}">
+            <link rel="manifest" href="">
+            <meta name="msapplication-TileImage" content="">
+            <meta name="theme-color" content="#ffffff">
+            <link href="{% static 'assets/css/theme.css' %}" rel="stylesheet" />
+            <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        </head>
+        <body>
+            <main class="main" id="top">
+                <section class="py-xxl-10 pb-0" id="home">
+                  <div class="bg-holder bg-size" style="background-image:url({% static "assets/img/gallery/hero-bg.png" %});background-position:top center;background-size:cover;">
+                  </div>
+                  <div class="container">
+                    <div class="row min-vh-xl-100 min-vh-xxl-25">
+                      <div class="col-md-5 col-xl-6 col-xxl-7 order-0 order-md-1 text-end"><img class="pt-7 pt-md-0 w-100" src="{% static "assets/img/gallery/hero.png" %}" alt="hero-header" /></div>
+                      <div class="col-md-75 col-xl-6 col-xxl-5 text-md-start text-center py-6">
+                        <h1 class="fw-light font-base fs-6 fs-xxl-7">We're <strong>determined </strong>for<br />your&nbsp;<strong>better life.</strong></h1>
+                        <p class="fs-1 mb-5">You can get the care you need 24/7 – be it online or in <br />person. You will be treated by caring specialist doctors. </p>
+                        <a class="btn btn-lg btn-primary rounded-pill" href="{% url 'create_appointment' %}" role="button">Make an Appointment</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="alan-btn"></div>
+                </section>
+                
+                
+                
+                <section class="pb-0" id="about">
+          
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-12 py-3">
+                        <div class="bg-holder bg-size" style="background-image:url({% static "assets/img/gallery/about-us.png" %});background-position:top center;background-size:contain;">
+                        </div>
+                  </section>
+                </section>
+              </main>
+            <script src="{% static 'vendors/@popperjs/popper.min.js' %}"></script>
+            <script src="{% static 'vendors/bootstrap/bootstrap.min.js' %}"></script>
+            <script src="{% static 'vendors/is/is.min.js' %}"></script>
+            <script src="https://scripts.sirv.com/sirvjs/v3/sirv.js"></script>
+            <script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>
+            <script src="{% static 'vendors/fontawesome/all.min.js' %}"></script>
+            <script src="{% static 'assets/js/theme.js' %}"></script>
+
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&amp;family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100&amp;display=swap" rel="stylesheet">
+        </body>
+        </html>
+        <script type="text/javascript"
+ src="https://studio.alan.app/web/lib/alan_lib.min.js"></script>
+<script>
+  var alanBtnInstance = alanBtn({
+    key: "ea346c269ebebd973ba7dc533a3f49b72e956eca572e1d8b807a3e2338fdd0dc/stage",
+    onCommand: function (commandData) {
+      if (commandData.command === "go:back") {
+        //call client code that will react on the received command
+      }
+    },
+    rootEl: document.getElementById("alan-btn"),
+  });
+</script>
+        {% if profile_status %}
+        <center>
+            <h2 style="color: red">
+                {{profile_status}}
+            </h2>
+        </center>
+        {% endif %}
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-success" style="color:green;"> {{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    </div>
+    {% endblock %}

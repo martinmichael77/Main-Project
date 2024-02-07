@@ -37,7 +37,8 @@ class Profile(models.Model):
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)  
     # @property
     # def age(self):
     #     if self.birth_date:
@@ -119,3 +120,72 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment ID: {self.id}, Status: {self.payment_status}"
+    
+
+    # class PrescriptionRefillRequest(models.Model):
+    #     patient = models.ForeignKey(User, related_name="refill_requests", on_delete=models.CASCADE)
+    #     prescription = models.ForeignKey(Medical, related_name="refill_requests", on_delete=models.CASCADE)
+    #     request_date = models.DateTimeField(auto_now_add=True)
+    #     is_approved = models.BooleanField(default=False)
+
+    # def __str__(self):
+    #     return f"Refill Request for Prescription ID: {self.prescription.id} by {self.patient.username}"
+
+# medicapp/models.py
+from django.contrib.auth.models import User
+from django.db import models
+
+class PrescriptionRefill(models.Model):
+    patient = models.ForeignKey(User, related_name="refill_requests", on_delete=models.CASCADE)
+    prescription = models.ForeignKey(Treatment, related_name="refill_requests", on_delete=models.CASCADE)
+    request_date = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Refill Request for Prescription ID: {self.prescription.id} by {self.patient.username}"
+
+# models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class Counselor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default=1)  # Replace 1 with an appropriate user ID or default value
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    # Add other fields as needed
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Hospital(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    contact = models.CharField(max_length=20, null=True, blank=True)
+    address = models.TextField(blank=True, null=True)
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
+    opening_time = models.TimeField(null=True, blank=True)
+    closing_time = models.TimeField(null=True, blank=True)
+    opening_days = models.CharField(max_length=100, null=True, blank=True)
+    hospital_image = models.ImageField(upload_to='hospital_images/', null=True, blank=True)
+    avgrating = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class UserSellerDistance(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
+    distance = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'hospital')
