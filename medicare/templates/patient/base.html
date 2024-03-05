@@ -80,9 +80,9 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="{% url 'refill_request_view' user.username %}">
+            <a class="nav-link" href="">
                 <i class="fas fa-calendar text-primary"></i>
-                <span style="color: white">Prescription Refill</span>
+                <span style="color: white">Presciption Refill</span>
             </a>
         </li>
         
@@ -96,6 +96,12 @@
             <a class="nav-link" href="{% url "nearby_hospital" %} ">
                 <i class="fas fa-calendar text-primary"></i>
                 <span style="color: white">Hospital Search</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url "view_healthcare_tips" %}">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Healthcare Tips</span>
             </a>
         </li>
         {% else %}

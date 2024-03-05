@@ -172,10 +172,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mailtoshowvalidationok@gmail.com'  
-EMAIL_HOST_PASSWORD = 'qtwpnirvgsxzhtdo'  
-DEFAULT_FROM_EMAIL = 'admin@medicare.com'
-
+EMAIL_HOST_USER = 'validationmailshow@gmail.com'  # Your Gmail email address
+EMAIL_HOST_PASSWORD = 'rjjh qjcq ouql pchb'  # Your Gmail email password or an app-specific pass
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use the appropriate template pack (e.g., 'bootstrap4' for Bootstrap 4)
@@ -203,3 +201,6 @@ RAZOR_KEY_SECRET = 'Md6mU2L9gPD18FUtXhm8nRim'
 #     "default_icon_children": "fas",
 #     "related_modal_active": False,
 # }
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,0 +1,160 @@
+{% extends 'patient/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body %}
+    <!-- Include Bootstrap CSS and JavaScript directly -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Custom styles */
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            color: #333;
+        }
+
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007BFF;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .heading h2 {
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .interactivity-options {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btn {
+            border: 1px solid #007BFF;
+            border-radius: 50%;
+            padding: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .action-btn.clicked {
+            background-color: #007BFF;
+            color: #fff;
+        }
+    </style>
+
+    <div id="content-wrapper" class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="heading">
+                            <h2>Healthcare Tips</h2>
+                        </div>
+                        <div class="row">
+                            {% for tip in healthcare_tips %}
+                                <div class="col-md-6">
+                                    <div class="card mb-4 shadow-sm">
+                                        {% if tip.image %}
+                                            <img src="{{ tip.image.url }}" class="card-img-top" alt="{{ tip.title }}">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h3 class="card-title">{{ tip.title }}</h3>
+                                            <p class="card-text">{{ tip.description }}</p>
+                                            <p class="card-text"><strong>Category:</strong> {{ tip.category }}</p>
+                                            <p class="card-text"><strong>Date Added:</strong> {{ tip.date_added }}</p>
+                                            <div class="interactivity-options">
+                                                <button class="like-btn action-btn {% if tip.id in liked_tips %}{% if tip.id not in unliked_tips %}clicked{% endif %}{% endif %}" data-tip-id="{{ tip.id }}">❤️</button>
+                                                <button class="share-btn action-btn" data-tip-id="{{ tip.id }}">🔗</button>
+                                                <button class="bookmark-btn action-btn {% if tip.id in bookmarked_tips %}clicked{% endif %}" data-tip-id="{{ tip.id }}">🔖</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $(".like-btn").click(function () {
+                var btn = $(this);
+                var tip_id = btn.data("tip-id");
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'like_tip' 0 %}".replace("0", tip_id),
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function (response) {
+                        // Update the button appearance after click
+                        btn.toggleClass("clicked");
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+
+            $(".share-btn").click(function () {
+                var tip_id = $(this).data("tip-id");
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'share_tip' 0 %}".replace("0", tip_id),
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function (response) {
+                        // Handle success
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+
+            $(".bookmark-btn").click(function () {
+                var btn = $(this);
+                var tip_id = btn.data("tip-id");
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'bookmark_tip' 0 %}".replace("0", tip_id),
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function (response) {
+                        // Update the button appearance after click
+                        btn.toggleClass("clicked");
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

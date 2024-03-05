@@ -1,0 +1,51 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Icon Cards-->
+        <div class="row">
+            <div class="card-body">
+                <h1 style="margin-bottom: 20px;">Counselors Details</h1>
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for counselor in counselors %}
+                        <tr>
+                            <td>{{ counselor.first_name }}</td>
+                            <td>{{ counselor.last_name }}</td>
+                            <td>{{ counselor.email }}</td>
+                            <td>
+                                {% if counselor.is_active %}
+                                <span class="badge badge-success">Active</span>
+                                {% else %}
+                                <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if counselor.is_active %}
+                                <a href="{% url 'deactivate_counselor' counselor.id %}" class="btn btn-danger">Deactivate</a>
+                                {% else %}
+                                <a href="{% url 'activate_counselor' counselor.id %}" class="btn btn-success">Activate</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

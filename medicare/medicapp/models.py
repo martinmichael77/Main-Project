@@ -153,6 +153,8 @@ class Counselor(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
+    is_active = models.BooleanField(default=False)  # Assuming is_active is a BooleanField
+
     # Add other fields as needed
 
     def get_full_name(self):
@@ -189,3 +191,62 @@ class UserSellerDistance(models.Model):
 
     class Meta:
         unique_together = ('user', 'hospital')
+
+
+class AppointmentCounselling(models.Model):
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
+    ]
+    
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    counselor = models.ForeignKey(Counselor, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+
+    def __str__(self):
+        return f"Appointment with {self.counselor.get_full_name()}"
+    
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class CounselingFeedback(models.Model):
+    counselor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='counselor_feedbacks')
+    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient_feedbacks')
+    feedback = models.TextField()
+
+    def __str__(self):
+        return f"Feedback for Counseling Session with {self.counselor.username}"
+
+
+from django.db import models
+
+class HealthcareTip(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    category = models.CharField(max_length=50)
+    date_added = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='healthcare_tips/', null=True, blank=True)
+    likes_count = models.IntegerField(default=0)
+    shares_count = models.IntegerField(default=0)
+    bookmarks_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+
+from django.db import models
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
+
+class LikedTip(models.Model):
+    session_key = models.CharField(max_length=40)
+    tip = models.ForeignKey(HealthcareTip, on_delete=models.CASCADE)
+
+class BookmarkedTip(models.Model):
+    session_key = models.CharField(max_length=40)
+    tip = models.ForeignKey(HealthcareTip, on_delete=models.CASCADE)

@@ -1,0 +1,35 @@
+{% extends 'counselor/base_counselor.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="" style="color: #555;">Dashboard</a></li>
+            <li class="breadcrumb-item active" style="color: #555;">Counselor Feedback</li>
+        </ol>
+
+        <!-- Icon Cards -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title" style="color: #4CAF50; margin-bottom: 20px;">Counselor Feedback</h1>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            {% for fb in feedback %}
+                            <li style="margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
+                                <span style="font-weight: bold; color: #333;">{{ fb.patient.username }}:</span> 
+                                <span>{{ fb.feedback }}</span>
+                            </li>
+                            {% empty %}
+                            <li style="margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">No feedback available.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

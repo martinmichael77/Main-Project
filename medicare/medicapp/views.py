@@ -1379,3 +1379,310 @@ def haversine(lat1, lon1, lat2, lon2):
 def view_hospital(request):
     seller=Hospital.objects.all
     return render(request, 'admin/view_hospital.html',{'seller':seller})
+
+def counselor_appointment(request):
+    if request.method == 'POST':
+        counselor_id = request.POST.get('counselor_id')
+        appointment_date = request.POST.get('appointment_date')
+        appointment_time = request.POST.get('appointment_time')
+        reason = request.POST.get('reason')
+
+        # Create a new AppointmentCounselling object
+        appointment = AppointmentCounselling(
+            patient=request.user,  # Assuming user is logged in
+            counselor_id=counselor_id,
+            date=appointment_date,
+            time=appointment_time,
+            reason=reason
+        )
+        appointment.save()
+        return redirect('patient_counselling')  # Redirect to a success page
+    else:
+        counselors = Counselor.objects.all()
+        return render(request, 'patient/counselling_appointment.html', {'counselors': counselors})
+
+from django.shortcuts import render, redirect
+from .models import Counselor, AppointmentCounselling
+from django.contrib.auth.decorators import login_required
+
+
+    
+
+
+
+from django.shortcuts import render
+from .models import AppointmentCounselling
+
+def counselor_appointments(request):
+    # Retrieve appointments for the logged-in counselor
+    counselor = request.user.counselor
+    appointments = AppointmentCounselling.objects.filter(counselor=counselor)
+    return render(request, 'counselor/appointments_made.html', {'appointments': appointments})
+
+from django.core.mail import send_mail
+def confirm_appointment(request, appointment_id):
+    appointment = get_object_or_404(AppointmentCounselling, id=appointment_id)
+    user=request.user
+    if request.method == 'POST':
+        appointment.status = 'confirmed'
+        appointment.save()
+        subject = 'Your appointment has been confirmed'
+        message = 'Your appointment has been confirmed'
+        from_email = settings.EMAIL_HOST_USER  # Your sender email address
+        recipient_list = [user.email]
+        print(recipient_list)
+        send_mail(subject, message, from_email, recipient_list)
+        # You can add additional logic here, such as sending notifications
+        return redirect('counselor_appointments')  # Redirect back to appointments page
+    return render(request, 'counselor/appointments_made.html', {'appointment': appointment})
+
+def complete_appointment(request, appointment_id):
+    appointment = get_object_or_404(AppointmentCounselling, id=appointment_id)
+    user=request.user
+    if request.method == 'POST':
+        appointment.status = 'completed'
+        appointment.save()
+        subject = 'Your appointment has been completed'
+        message = 'Your appointment has been completed'
+        from_email = settings.EMAIL_HOST_USER  # Your sender email address
+        recipient_list = [user.email]
+        print(recipient_list)
+        send_mail(subject, message, from_email, recipient_list)
+        # You can add additional logic here, such as updating records
+        return redirect('counselor_appointments')  # Redirect back to appointments page
+    return render(request, 'counselor/appointments_made.html', {'appointment': appointment})
+
+
+
+# def appointment_details(request):
+#     # Assuming you have a way to identify the current user, 
+#     # such as through authentication or session data
+#     current_user = request.user
+    
+#     # Query the database for the current user's appointment
+#     appointment = Appointment.objects.filter(patient=current_user).first()
+    
+#     # Assuming 'status' is a field in the Appointment model
+#     status = appointment.get_status_display() if appointment else "No appointment found"
+    
+#     context = {
+#         'appointment': appointment,
+#         'status': status
+#     }
+#     return render(request, 'patient/appointment_details.html', context)
+
+def appointment_details(request):
+    # Retrieve the current user's appointments
+    user = request.user
+    appointments = AppointmentCounselling.objects.filter(patient=user)
+
+    return render(request, 'patient/appointment_details.html', {'appointments': appointments})
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import CounselingFeedback
+
+@login_required
+def submit_feedback(request):
+    if request.method == 'POST':
+        feedback_text = request.POST.get('feedback')
+        counselor_id = request.POST.get('counselor')
+        counselor = Counselor.objects.get(id=counselor_id)
+        CounselingFeedback.objects.create(counselor=counselor.user, patient=request.user, feedback=feedback_text)
+        return redirect('submit_feedback')
+    counselors = Counselor.objects.all()
+    return render(request, 'patient/feedback_form.html', {'counselors': counselors})
+
+
+from django.shortcuts import render
+from .models import CounselingFeedback
+
+def counselor_feedback(request):
+    counselor = request.user
+    feedback = CounselingFeedback.objects.filter(counselor=counselor)
+    return render(request, 'counselor/feedback_list.html', {'feedback': feedback})
+
+
+
+from django.shortcuts import render, redirect
+from .models import Counselor
+
+def counselor_list(request):
+    counselors = Counselor.objects.all()
+    return render(request, 'admin/counselor_info.html', {'counselors': counselors})
+
+def activate_counselor(request, counselor_id):
+    counselor = Counselor.objects.get(pk=counselor_id)
+    counselor.is_active = True
+    counselor.save()
+    return redirect('counselor_list')
+
+def deactivate_counselor(request, counselor_id):
+    counselor = Counselor.objects.get(pk=counselor_id)
+    counselor.is_active = False
+    counselor.save()
+    return redirect('counselor_list')
+
+
+from django.shortcuts import render
+from .models import AppointmentCounselling
+
+def counselor_appointments_list(request):
+    appointments = AppointmentCounselling.objects.all()  # Query to retrieve all appointments
+    return render(request, 'admin/counselor_appointments.html', {'appointments': appointments})
+
+
+# medicapp/views.py
+
+from django.shortcuts import render, redirect
+from .models import HealthcareTip
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+@login_required
+def add_healthcare_tip(request):
+    if request.method == 'POST':
+        # Retrieve form data from POST request
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        category = request.POST.get('category')
+        image = request.FILES.get('image') if 'image' in request.FILES else None
+
+        # Create and save the HealthcareTip object
+        tip = HealthcareTip(title=title, description=description, category=category, image=image)
+        tip.save()
+
+        # Display success message
+        messages.success(request, 'Healthcare Tip added successfully!')
+        
+        # Redirect to a success page or any other appropriate page
+        return redirect('home')  # Change 'counselor_list' to the appropriate URL name
+
+    return render(request, 'admin/add_healthcare_tip.html')
+
+
+# from django.shortcuts import render, redirect, get_object_or_404
+# from django.http import JsonResponse
+# from .models import HealthcareTip
+
+
+# def like_tip(request, tip_id):
+#     tip = get_object_or_404(HealthcareTip, id=tip_id)
+#     tip.likes_count += 1
+#     tip.save()
+#     return JsonResponse({'likes_count': tip.likes_count})
+
+# def share_tip(request, tip_id):
+#     tip = get_object_or_404(HealthcareTip, id=tip_id)
+#     tip.shares_count += 1
+#     tip.save()
+#     return JsonResponse({'shares_count': tip.shares_count})
+
+# def bookmark_tip(request, tip_id):
+#     tip = get_object_or_404(HealthcareTip, id=tip_id)
+#     tip.bookmarks_count += 1
+#     tip.save()
+#     return JsonResponse({'bookmarks_count': tip.bookmarks_count})
+
+
+# def view_healthcare_tips(request):
+#     healthcare_tips = HealthcareTip.objects.all()
+#     return render(request, 'patient/view_healthcare_tips.html', {'healthcare_tips': healthcare_tips})
+
+# views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.core.exceptions import ObjectDoesNotExist
+from .models import HealthcareTip, LikedTip, BookmarkedTip
+
+def view_healthcare_tips(request):
+    healthcare_tips = HealthcareTip.objects.all()
+    session_key = request.session.session_key
+    liked_tips = LikedTip.objects.filter(session_key=session_key).values_list('tip_id', flat=True)
+    bookmarked_tips = BookmarkedTip.objects.filter(session_key=session_key).values_list('tip_id', flat=True)
+    return render(request, 'patient/view_healthcare_tips.html', {'healthcare_tips': healthcare_tips, 'liked_tips': liked_tips, 'bookmarked_tips': bookmarked_tips})
+
+def like_tip(request, tip_id):
+    if request.user.is_authenticated:
+        tip = get_object_or_404(HealthcareTip, id=tip_id)
+        session_key = request.session.session_key
+        try:
+            liked_tip = LikedTip.objects.get(tip=tip, session_key=session_key)
+            tip.likes_count -= 1
+            liked_tip.delete()
+        except ObjectDoesNotExist:
+            tip.likes_count += 1
+            LikedTip.objects.create(tip=tip, session_key=session_key)
+        tip.save()
+        return JsonResponse({'likes_count': tip.likes_count})
+    else:
+        return JsonResponse({'error': 'User not authenticated'})
+
+def share_tip(request, tip_id):
+    tip = get_object_or_404(HealthcareTip, id=tip_id)
+    tip.shares_count += 1
+    tip.save()
+    return JsonResponse({'shares_count': tip.shares_count})
+
+# views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from .models import HealthcareTip, LikedTip, BookmarkedTip
+from django.contrib.sessions.models import Session
+from django.core.exceptions import ObjectDoesNotExist
+
+def bookmark_tip(request, tip_id):
+    if request.user.is_authenticated:
+        tip = get_object_or_404(HealthcareTip, id=tip_id)
+        session_key = request.session.session_key
+        try:
+            bookmarked_tip = BookmarkedTip.objects.get(tip=tip, session_key=session_key)
+            bookmarked_tip.delete()
+            message = 'Bookmark removed'
+        except ObjectDoesNotExist:
+            BookmarkedTip.objects.create(tip=tip, session_key=session_key)
+            message = 'Bookmark added'
+        return JsonResponse({'message': message})
+    else:
+        return JsonResponse({'error': 'User not authenticated'})
+
+
+def view_healthcare_tips_admin(request):
+    healthcare_tips = HealthcareTip.objects.all()
+    return render(request, 'admin/view_healthcare_tips.html', {'healthcare_tips': healthcare_tips})
+
+
+
+# views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import HealthcareTip
+
+def edit_healthcare_tip(request, tip_id):
+    tip = get_object_or_404(HealthcareTip, id=tip_id)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        category = request.POST.get('category')
+        # Update the healthcare tip object with the new data
+        tip.title = title
+        tip.description = description
+        tip.category = category
+        tip.save()
+        return redirect('home')  # Redirect back to the list view
+    return render(request, 'admin/edit_healthcare_tip.html', {'tip': tip})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import HealthcareTip
+
+def delete_healthcare_tip(request, tip_id):
+    tip = get_object_or_404(HealthcareTip, id=tip_id)
+    if request.method == 'POST':
+        tip.delete()
+        return redirect('home')  # Redirect back to the list view
+    return render(request, 'admin/delete_healthcare_tip.html', {'tip': tip})

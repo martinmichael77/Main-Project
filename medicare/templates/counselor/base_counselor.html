@@ -74,9 +74,15 @@
     
 
     <li class="nav-item">
-        <a class="nav-link" href="">
+        <a class="nav-link" href="{% url "counselor_appointments" %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">Appointment</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'counselor_feedback' %}">
+            <i class="fas fa-calendar text-primary"></i>
+            <span style="color: white">Feedbacks</span>
         </a>
     </li>
 </ul>    

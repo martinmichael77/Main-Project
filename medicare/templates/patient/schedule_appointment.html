@@ -1,0 +1,31 @@
+{% extends 'patient/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Schedule Appointment</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="counselor">Choose Counselor:</label>
+            <select class="form-control" id="counselor" name="counselor_id">
+                {% for counselor in counselors %}
+                    <option value="{{ counselor.id }}">{{ counselor.get_full_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="appointment_date">Appointment Date:</label>
+            <input type="date" class="form-control" id="appointment_date" name="appointment_date">
+        </div>
+        <div class="form-group">
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="time" class="form-control" id="appointment_time" name="appointment_time">
+        </div>
+        <div class="form-group">
+            <label for="reason">Reason for Appointment:</label>
+            <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+    </form>
+</div>
+{% endblock %}

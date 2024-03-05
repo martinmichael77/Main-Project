@@ -71,6 +71,24 @@ urlpatterns = [
     path('add_hospital/', views.add_hospital, name='add_hospital'),
     path('nearby_hospital', views.nearby_hospital, name='nearby_hospital'),
     path('view_hospital', views.view_hospital, name='view_hospital'),
+    path('counselor_appointment', views.counselor_appointment, name='counselor_appointment'),
+    path('counselor_appointments', views.counselor_appointments, name='counselor_appointments'),
+    path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
+    path('counselor/feedback/', views.counselor_feedback, name='counselor_feedback'),
+    path('counselor_list', views.counselor_list, name='counselor_list'),
+    path('activate_counselor/<int:counselor_id>/', views.activate_counselor, name='activate_counselor'),
+    path('counselors/deactivate/<int:counselor_id>/', views.deactivate_counselor, name='deactivate_counselor'),
+    path('counselor_appointments_list', views.counselor_appointments_list, name='counselor_appointments_list'),    
+    path('add_healthcare_tip', views.add_healthcare_tip, name='add_healthcare_tip'),
+    path('view_healthcare_tips', views.view_healthcare_tips, name='view_healthcare_tips'),
+    path('like_tip/<int:tip_id>/', views.like_tip, name='like_tip'),
+    path('share_tip/<int:tip_id>/', views.share_tip, name='share_tip'),
+    path('bookmark_tip/<int:tip_id>/', views.bookmark_tip, name='bookmark_tip'),
+    path('view_healthcare_tips_admin', views.view_healthcare_tips_admin, name='view_healthcare_tips_admin'),
+    path('edit_healthcare_tip/<int:tip_id>/', views.edit_healthcare_tip, name='edit_healthcare_tip'),
+    path('delete_healthcare_tip/<int:tip_id>/', views.delete_healthcare_tip, name='delete_healthcare_tip'),
+
+
 
 
 
@@ -79,8 +97,13 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    
-]
 
+    path('confirm-appointment/<int:appointment_id>/', views.confirm_appointment, name='confirm_appointment'),
+    path('complete-appointment/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
+    path('appointment_details', views.appointment_details, name='appointment_details'),
+
+    
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

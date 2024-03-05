@@ -1,0 +1,129 @@
+{% extends 'patient/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body %}
+
+<!-- Include Bootstrap CSS and JavaScript directly -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<style>
+    /* styles.css */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #333;
+}
+
+.form-control {
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #007BFF;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.validation-message {
+    color: red;
+    font-size: 14px;
+}
+</style>
+
+<div id="content-wrapper">
+    <div class="container">
+        <h2>Schedule Appointment</h2>
+        <form method="post" id="appointmentForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="counselor">Choose Counselor:</label>
+                <select class="form-control" id="counselor" name="counselor_id">
+                    {% for counselor in counselors %}
+                        <option value="{{ counselor.id }}">{{ counselor.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="appointment_date">Appointment Date:</label>
+                <input type="date" class="form-control" id="appointment_date" name="appointment_date">
+                <span id="dateValidation" class="validation-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="appointment_time">Appointment Time:</label>
+                <input type="time" class="form-control" id="appointment_time" name="appointment_time">
+                <span id="timeValidation" class="validation-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="reason">Reason for Appointment:</label>
+                <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
+                <span id="reasonValidation" class="validation-message"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Schedule Appointment</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        var yyyy = today.getFullYear();
+    
+        today = yyyy + '-' + mm + '-' + dd;
+        document.getElementById("appointment_date").setAttribute("min", today);
+    }
+    
+    // Live validation functions
+    $('#appointment_date').on('input', function() {
+        validateDate();
+    });
+    
+    $('#appointment_time').on('input', function() {
+        validateTime();
+    });
+    
+    $('#reason').on('input', function() {
+        validateReason();
+    });
+    
+    function validateDate() {
+        var selectedDate = new Date(document.getElementById("appointment_date").value);
+        var currentDate = new Date();
+        var dateValidationMsg = document.getElementById("dateValidation");
+    
+        if (selectedDate < currentDate) {
+            dateValidationMsg.textContent = "Please select today's date or a future date.";
+        } else {
+            dateValidationMsg.textContent = "";
+        }
+    }
+    
+    function validateTime() {
+        // Implement time validation logic here
+        // For now, let's assume the time is always valid
+        document.getElementById("timeValidation").textContent = "";
+    }
+    
+    function validateReason() {
+        var reason = document.getElementById("reason").value;
+        var reasonValidationMsg = document.getElementById("reasonValidation");
+    
+        if (!/^[a-zA-Z\s]*$/.test(reason)) {
+            reasonValidationMsg.textContent = "Please enter only alphabets.";
+        } else {
+            reasonValidationMsg.textContent = "";
+        }
+    }
+</script>
+
+{% endblock %}

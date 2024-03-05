@@ -102,12 +102,18 @@
             <span style="color: white">Add Counselor</span>
         </a>
     </li>
-    {% comment %} <li class="nav-item" id="doc-info">
-        <a class="nav-link" href="{% url "counselorinfo" %}">
+    <li class="nav-item" id="counselor-info">
+        <a class="nav-link" href="{% url "counselor_list" %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">Counselor Info</span>
         </a>
-    </li> {% endcomment %}
+    </li>
+    <li class="nav-item" id="counselor-appointment">
+        <a class="nav-link" href="{% url "counselor_appointments_list" %}">
+            <i class="fas fa-calendar text-primary"></i>
+            <span style="color: white">Counselor Appointments</span>
+        </a>
+    </li>
     <li class="nav-item" id="Hospital-info">
         <a class="nav-link" href="{% url "add_hospital" %}">
             <i class="fas fa-calendar text-primary"></i>
@@ -118,6 +124,18 @@
         <a class="nav-link" href="{% url "view_hospital" %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">View Hospital Locations</span>
+        </a>
+    </li>
+    <li class="nav-item" id="Healthcare-tips">
+        <a class="nav-link" href="{% url "add_healthcare_tip" %}">
+            <i class="fas fa-calendar text-primary"></i>
+            <span style="color: white">Add Healthcare Tips</span>
+        </a>
+    </li>
+    <li class="nav-item" id="view-Healthcare-tips">
+        <a class="nav-link" href="{% url "view_healthcare_tips_admin" %}">
+            <i class="fas fa-calendar text-primary"></i>
+            <span style="color: white">View Healthcare Tips</span>
         </a>
     </li>
 </ul> 
