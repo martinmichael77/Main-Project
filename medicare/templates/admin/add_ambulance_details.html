@@ -1,0 +1,119 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card-body">
+                <h1>Add Ambulance Details</h1>
+                <form method="post" id="ambulanceForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="contact_number">Contact Number:</label>
+                        <input type="text" class="form-control" id="contact_number" name="contact_number" required>
+                        <div id="contactNumberError" class="text-danger"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                        <div id="locationError" class="text-danger"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicle_number">Vehicle Number:</label>
+                        <input type="text" class="form-control" id="vehicle_number" name="vehicle_number" required>
+                        <div id="vehicleNumberError" class="text-danger"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicle_model">Vehicle Model:</label>
+                        <input type="text" class="form-control" id="vehicle_model" name="vehicle_model" required>
+                        <div id="vehicleModelError" class="text-danger"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicle_capacity">Vehicle Capacity:</label>
+                        <input type="number" class="form-control" id="vehicle_capacity" name="vehicle_capacity" required>
+                        <div id="vehicleCapacityError" class="text-danger"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="driver_name">Driver Name:</label>
+                        <input type="text" class="form-control" id="driver_name" name="driver_name" required>
+                        <div id="driverNameError" class="text-danger"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const contactNumberInput = document.getElementById('contact_number');
+        const locationInput = document.getElementById('location');
+        const vehicleModelInput = document.getElementById('vehicle_model');
+        const vehicleCapacityInput = document.getElementById('vehicle_capacity');
+        const driverNameInput = document.getElementById('driver_name');
+
+        contactNumberInput.addEventListener('input', function() {
+            const contactNumberValue = contactNumberInput.value;
+            const isValid = /^\d{10}$/.test(contactNumberValue);
+            const errorDiv = document.getElementById('contactNumberError');
+            if (!isValid) {
+                errorDiv.textContent = "Contact number should be 10 digits.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        locationInput.addEventListener('input', function() {
+            const locationValue = locationInput.value;
+            const isValid = /^[a-zA-Z\s]+$/.test(locationValue);
+            const errorDiv = document.getElementById('locationError');
+            if (!isValid) {
+                errorDiv.textContent = "Location should contain only letters.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        vehicleModelInput.addEventListener('input', function() {
+            const vehicleModelValue = vehicleModelInput.value;
+            const isValid = /^[a-zA-Z\s]+$/.test(vehicleModelValue);
+            const errorDiv = document.getElementById('vehicleModelError');
+            if (!isValid) {
+                errorDiv.textContent = "Vehicle model should contain only letters.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        vehicleCapacityInput.addEventListener('input', function() {
+            const vehicleCapacityValue = vehicleCapacityInput.value;
+            const isValid = /^\d+$/.test(vehicleCapacityValue);
+            const errorDiv = document.getElementById('vehicleCapacityError');
+            if (!isValid) {
+                errorDiv.textContent = "Vehicle capacity should be numeric.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        driverNameInput.addEventListener('input', function() {
+            const driverNameValue = driverNameInput.value;
+            const isValid = /^[a-zA-Z\s]+$/.test(driverNameValue);
+            const errorDiv = document.getElementById('driverNameError');
+            if (!isValid) {
+                errorDiv.textContent = "Driver name should contain only letters.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-a^y)o_!-92k=6ok)c1*tef7i0y^pu2d=%z!#gcwc4wt=q6)9l*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','10.0.2.2']
 
 
 # Application definition
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'medicapp',
     'jazzmin',
     'allauth',
+    'easy_pdf',
     'crispy_forms',
     'django.contrib.humanize',
     'django.contrib.admin',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'rest_framework',
     
 ]
 
@@ -181,7 +183,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Use the appropriate template pack (e.g., 
 RAZOR_KEY_ID = 'rzp_test_xfrnYSFQFDBO1w'
 RAZOR_KEY_SECRET = 'Md6mU2L9gPD18FUtXhm8nRim'
 
-# JAZZMIN_SETTINGS = {
+# JAZZMIN_SETTINGS = {      
 #     "site_title": "Your Admin Panel",
 #     "site_header": "Your Admin Panel",
 #     "site_url": "/admin/",

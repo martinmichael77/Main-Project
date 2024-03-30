@@ -2,16 +2,100 @@
 {% load static %}
 
 {% block body %}
+<script>
+    // Function to validate title
+    function validateTitle(inputField) {
+        const titleRegex = /^[a-zA-Z\s]+$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!titleRegex.test(fieldValue)) {
+            feedback.textContent = "Only alphabets are allowed in the title.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate category
+    function validateCategory(inputField) {
+        const categoryRegex = /^[a-zA-Z\s]+$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!categoryRegex.test(fieldValue)) {
+            feedback.textContent = "Only alphabets are allowed in the category.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate image format
+    function validateImage(inputField) {
+        const allowedFormats = ['jpg', 'jpeg', 'png'];
+        const file = inputField.files[0];
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!file) {
+            feedback.textContent = "Please choose an image.";
+            feedback.style.color = "red";
+            return;
+        }
+
+        const fileNameParts = file.name.split('.');
+        const fileFormat = fileNameParts[fileNameParts.length - 1].toLowerCase();
+
+        if (!allowedFormats.includes(fileFormat)) {
+            feedback.textContent = "Invalid image format. Only JPG and PNG formats are allowed.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate the form before submission
+    function validateForm(event) {
+        const titleInput = document.getElementById('title');
+        const descriptionInput = document.getElementById('description');
+        const categoryInput = document.getElementById('category');
+        const imageInput = document.getElementById('image');
+        let isValid = true;
+
+        // Validate title
+        validateTitle(titleInput);
+        // Validate category
+        validateCategory(categoryInput);
+        // Validate image format
+        validateImage(imageInput);
+
+        if (!titleInput.value.trim() || !descriptionInput.value.trim() || !categoryInput.value.trim() || !imageInput.value.trim()) {
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if any field is empty or contains invalid data
+        }
+    }
+</script>
+
 <div id="content-wrapper">
     <div class="container-fluid">
         <div class="row">
             <div class="card-body">
                 <h2>Add Healthcare Tip</h2>
-                <form method="post" enctype="multipart/form-data" action="{% url 'add_healthcare_tip' %}">
+                <form method="post" enctype="multipart/form-data" action="{% url 'add_healthcare_tip' %}" onsubmit="validateForm(event)">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="title">Title:</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
+                        <input type="text" class="form-control" id="title" name="title" required oninput="validateTitle(this)">
+                        <div class="feedback" style="color: red;"></div>
                     </div>
                     <div class="form-group">
                         <label for="description">Description:</label>
@@ -19,11 +103,13 @@
                     </div>
                     <div class="form-group">
                         <label for="category">Category:</label>
-                        <input type="text" class="form-control" id="category" name="category" required>
+                        <input type="text" class="form-control" id="category" name="category" required oninput="validateCategory(this)">
+                        <div class="feedback" style="color: red;"></div>
                     </div>
                     <div class="form-group">
                         <label for="image">Image:</label>
-                        <input type="file" class="form-control-file" id="image" name="image">
+                        <input type="file" class="form-control-file" id="image" name="image" onchange="validateImage(this)">
+                        <div class="feedback" style="color: red;"></div>
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">Add Tip</button>
@@ -33,4 +119,12 @@
         </div>
     </div>
 </div>
+
+<style>
+    .feedback {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+
 {% endblock %}

@@ -1,4 +1,8 @@
 {% load static %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Instascan library -->
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,9 +34,14 @@
             </div>
         </div> {% endcomment %}
     </form>
-
+  
     <!-- Navbar -->
     <ul class="navbar-nav ml-auto ml-md-0">
+        <li class="nav-item nav-settings d-none d-lg-block">
+            <a class="nav-link" onclick="openQrScannerModal()" id="scanQrCodeBtn">
+              <i class="fas fa-search"></i>
+            </a>
+          </li>
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-user-circle fa-fw text-primary"></i>
@@ -54,7 +63,7 @@
 <ul class="sidebar navbar-nav">
 
     <li class="nav-item active">
-        <a class="nav-link" href="">
+        <a class="nav-link" href="{% url "home_counselor" %}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Counselor Dashboard</span>
         </a>
@@ -65,12 +74,12 @@
             <span>Logged As {{ user.username }}</span>
         </a>
     </li>
-     <li class="nav-item">
+     {% comment %} <li class="nav-item">
         <a class="nav-link" href="{% url "home_counselor" %}">
             <i class="fas fa-medkit text-primary"></i>
             <span style="color: white">Our Services</span>
         </a>
-    </li>
+    </li> {% endcomment %}
     
 
     <li class="nav-item">
@@ -80,13 +89,27 @@
         </a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" href="{% url "meeting" %}">
+            <i class="fas fa-calendar text-primary"></i>
+            <span style="color: white">Video Conference</span>
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" href="{% url 'counselor_feedback' %}">
             <i class="fas fa-calendar text-primary"></i>
             <span style="color: white">Feedbacks</span>
         </a>
     </li>
 </ul>    
-
+<div id="qrScannerModal" class="modal">
+    <div class="modal-content" style="width: 500px; margin: 0 auto; margin-top:100px;">
+        <button class="close-modal" onclick="closeQrScannerModal()">&times;</button>
+        <h5>Place the QR Code in this space</h5>
+        <input type="file" id="fileInput" accept="image/*">
+        <button onclick="scanQRCodeFromFile()">Scan from File</button>
+        <video id="qrScanner" width="100%" height="100%"></video>
+    </div>
+</div>
 
     {% block body %}{% endblock %}
     
@@ -129,7 +152,116 @@
 <script src="{% static 'core/js/popper.js' %}"></script>    
 <script src="{% static 'core/js/bootstrap.js' %}"></script> 
 
+<script>
+    var qrScannerModal = document.getElementById('qrScannerModal');
+    var qrScanner = document.getElementById('qrScanner');
+    var mediaStream;
+    
+    function openQrScannerModal() {
+        // Show the modal
+        qrScannerModal.style.display = 'block';
 
+        // Access the camera
+        Instascan.Camera.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                var scanner = new Instascan.Scanner({ video: qrScanner });
+                scanner.addListener('scan', function (content) {
+                    handleScannedContent(content);
+                    closeQrScannerModal();
+                });
+                scanner.start(cameras[0]);
+                mediaStream = cameras[0];
+            } else {
+                alert('No cameras found.');
+                closeQrScannerModal();
+            }
+        });
+    }
+    function scanQRCodeFromFile() {
+        var fileInput = document.getElementById('fileInput');
+        var file = fileInput.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                // Perform logic with the scanned QR code content
+                var scannedContent = e.target.result;
+                // ...
+
+                // Close the modal and reset file input
+                handleScannedContent(scannedContent);
+                closeQrScannerModal();
+                fileInput.value = null;
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            alert('Please select a file.');
+        }
+    }
+
+    function closeQrScannerModal() {
+        // Hide the modal and stop the camera stream
+        qrScannerModal.style.display = 'none';
+        if (mediaStream) {
+            var tracks = mediaStream.getTracks();
+            tracks.forEach(track => track.stop());
+            mediaStream = null;
+        }
+    }
+
+    function handleScannedContent(content) {
+        var pattern = /^Appointment ID: (\d+)\n$/;
+
+    // Check if the scanned content matches the pattern
+        var match = content.match(pattern);
+        
+
+
+        if (match) {
+        // Extract relevant information from the match
+            var appointmentId = match[1];
+            // Customize this function to handle the scanned content
+            alert('Scanned content: ' + content +appointmentId);
+            // You can perform actions based on the scanned content
+            // For example, make an AJAX request to validate the order ID
+            // and update the UI accordingly.
+            window.location.href = "{% url 'qrscan' appointment_id=0 %}".replace('0', appointmentId);
+            // If the content doesn't match the expected format, show an alert or handle accordingly
+            alert('Invalid QR code content. Please scan a valid QR code.');
+        }
+    // Perform any additional logic here, e.g., make an AJAX request to validate the order ID
+
+    // Redirect to the sellerorder URL
+   
+    }
+
+    $(document).ready(function () {
+        // Get the button and create a new instance of Instascan
+        var scanQrCodeBtn = $('#scanQrCodeBtn');
+        var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+
+        // Handle the scan event
+        scanner.addListener('scan', function (content) {
+            // Call the handleScannedContent function with the scanned content
+            handleScannedContent(content);
+            // Stop the scanner after a successful scan
+            scanner.stop();
+        });
+
+        // Handle the click event on the scan button
+        scanQrCodeBtn.click(function () {
+            // Start the QR code scanner
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    alert('No cameras found.');
+                }
+            });
+        });
+    });
+</script>
 {% include 'doctor/ajax.html' %}
 
 

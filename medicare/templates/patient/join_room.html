@@ -1,0 +1,31 @@
+{% extends 'patient/base.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container">
+        <div class="container">
+            <div class="login form bg-light p-4 rounded">
+                <h2 class="text-center mb-4">Join Room</h2>
+                <form action="{% url 'join_room' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter room ID" name="roomID">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">Join</button>
+                    </div>
+                    <div class="text-center">
+                        {% if success %}
+                        <p style="color: green;"><b>{{ success }}</b></p>
+                        {% endif %}
+                        {% if error %}
+                        <p style="color: red;">{{ error }}</p>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

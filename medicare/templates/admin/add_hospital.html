@@ -5,69 +5,127 @@
 <script>
     // Function to validate name fields
     function validateName(inputField) {
-        var nameRegex = /^[a-zA-Z]+$/;
-        var fieldValue = inputField.value;
-        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+        const nameRegex = /^[a-zA-Z]+$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
 
-        if (!fieldValue.trim()) {
-            feedback.innerHTML = "Please fill out this field.";
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
             feedback.style.color = "red";
         } else if (!nameRegex.test(fieldValue)) {
-            feedback.innerHTML = "Only alphabets are allowed.";
+            feedback.textContent = "Only alphabets are allowed.";
             feedback.style.color = "red";
         } else {
-            feedback.innerHTML = "";
+            feedback.textContent = "";
         }
     }
 
     // Function to validate email
     function validateEmail(inputField) {
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        var fieldValue = inputField.value;
-        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
 
-        if (!fieldValue.trim()) {
-            feedback.innerHTML = "Please fill out this field.";
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
             feedback.style.color = "red";
         } else if (!emailRegex.test(fieldValue)) {
-            feedback.innerHTML = "Invalid email address.";
+            feedback.textContent = "Invalid email address.";
             feedback.style.color = "red";
         } else {
-            feedback.innerHTML = "";
+            feedback.textContent = "";
         }
     }
 
-    // Function to validate license number
-    function validateLicenseNumber(inputField) {
-        var licenseRegex = /^MDIN\d+$/;
-        var fieldValue = inputField.value;
-        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+    // Function to validate city, state, and country
+    function validateCityStateCountry(inputField) {
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+        const isValid = /^[a-zA-Z\s]+$/.test(fieldValue);
 
-        if (!fieldValue.trim()) {
-            feedback.innerHTML = "Please fill out this field.";
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
             feedback.style.color = "red";
-        } else if (!licenseRegex.test(fieldValue)) {
-            feedback.innerHTML = "License number should start with 'MDIN' followed by digits.";
+        } else if (!isValid) {
+            feedback.textContent = "Only alphabets are allowed.";
             feedback.style.color = "red";
         } else {
-            feedback.innerHTML = "";
+            feedback.textContent = "";
         }
     }
 
-    // Function to validate phone number
-    function validatePhoneNumber(inputField) {
-        var phoneRegex = /^\d{10}$/;
-        var fieldValue = inputField.value;
-        var feedback = inputField.nextElementSibling; // Get the sibling for feedback
+    // Function to validate address
+    function validateAddress(inputField) {
+        // Address can contain alphabets, numbers, and some special characters like commas, periods, etc.
+        // You can adjust this regex based on your specific requirements
+        const addressRegex = /^[a-zA-Z0-9\s.,/-]+$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
 
-        if (!fieldValue.trim()) {
-            feedback.innerHTML = "Please fill out this field.";
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
             feedback.style.color = "red";
-        } else if (!phoneRegex.test(fieldValue)) {
-            feedback.innerHTML = "Invalid Phone number";
+        } else if (!addressRegex.test(fieldValue)) {
+            feedback.textContent = "Invalid characters in address.";
             feedback.style.color = "red";
         } else {
-            feedback.innerHTML = "";
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate latitude and longitude
+    function validateLatLong(inputField) {
+        const latLongRegex = /^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/;
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (!latLongRegex.test(fieldValue)) {
+            feedback.textContent = "Invalid format for latitude/longitude.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate opening days
+    function validateOpeningDays(inputField) {
+        const fieldValue = inputField.value.trim();
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!fieldValue) {
+            feedback.textContent = "Please fill out this field.";
+            feedback.style.color = "red";
+        } else if (isNaN(fieldValue)) {
+            feedback.textContent = "Opening days must be a number.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
+        }
+    }
+
+    // Function to validate hospital image format
+    function validateImage(inputField) {
+        const allowedFormats = ['jpg', 'jpeg', 'png'];
+        const file = inputField.files[0];
+        const feedback = inputField.nextElementSibling; // Get the sibling for feedback
+
+        if (!file) {
+            feedback.textContent = "Please choose an image.";
+            feedback.style.color = "red";
+            return;
+        }
+
+        const fileNameParts = file.name.split('.');
+        const fileFormat = fileNameParts[fileNameParts.length - 1].toLowerCase();
+
+        if (!allowedFormats.includes(fileFormat)) {
+            feedback.textContent = "Invalid image format. Only JPG and PNG formats are allowed.";
+            feedback.style.color = "red";
+        } else {
+            feedback.textContent = "";
         }
     }
 </script>
@@ -96,57 +154,53 @@
 
                             <div class="form-group">
                                 <label for="city">City</label>
-                                <input type="text" class="form-control" id="city" name="city" placeholder="City">
+                                <input type="text" class="form-control" id="city" name="city" placeholder="City" oninput="validateCityStateCountry(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="state">State</label>
-                                <input type="text" class="form-control" id="state" name="state" placeholder="State">
+                                <input type="text" class="form-control" id="state" name="state" placeholder="State" oninput="validateCityStateCountry(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="country">Country</label>
-                                <input type="text" class="form-control" id="country" name="country" placeholder="Country">
+                                <input type="text" class="form-control" id="country" name="country" placeholder="Country" oninput="validateCityStateCountry(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
-
                             <div class="form-group">
                                 <label for="contact">Contact</label>
                                 <input type="text" class="form-control" id="contact" name="contact" placeholder="Contact">
                             </div>
-
                             <div class="form-group">
                                 <label for="address">Address</label>
-                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address"></textarea>
+                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address" oninput="validateAddress(this)"></textarea>
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="latitude">Latitude</label>
-                                <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude">
+                                <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude" oninput="validateLatLong(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="longitude">Longitude</label>
-                                <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="opening_time">Opening Time</label>
-                                <input type="time" class="form-control" id="opening_time" name="opening_time">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="closing_time">Closing Time</label>
-                                <input type="time" class="form-control" id="closing_time" name="closing_time">
+                                <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude" oninput="validateLatLong(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="opening_days">Opening Days</label>
-                                <input type="text" class="form-control" id="opening_days" name="opening_days" placeholder="Opening Days">
+                                <input type="text" class="form-control" id="opening_days" name="opening_days" placeholder="Opening Days" oninput="validateOpeningDays(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="hospital_image">Hospital Image</label>
-                                <input type="file" class="form-control-file" id="hospital_image" name="hospital_image">
+                                <input type="file" class="form-control-file" id="hospital_image" name="hospital_image" onchange="validateImage(this)">
+                                <div class="feedback" style="color: red;"></div>
                             </div>
 
                             <div class="form-group">
@@ -161,7 +215,7 @@
                             <div class="alert alert-success mt-3">
                                 Hospital details added successfully!
                             </div>
-                        {% endif %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>

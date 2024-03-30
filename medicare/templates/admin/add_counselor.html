@@ -3,8 +3,23 @@
 
 {% block body %}
 <script>
-    // Validation functions (similar to the ones you used for adding doctors)
-    // ...
+    // Function to validate first and last names
+    function validateName(inputField) {
+        const value = inputField.value.trim();
+        const isValid = /^[a-zA-Z]+$/.test(value);
+        toggleErrorStyling(inputField, isValid);
+        const feedback = inputField.nextElementSibling;
+        feedback.textContent = isValid ? '' : 'Please enter only alphabets.';
+    }
+
+    // Function to validate email address
+    function validateEmail(inputField) {
+        const value = inputField.value.trim();
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        toggleErrorStyling(inputField, isValid);
+        const feedback = inputField.nextElementSibling;
+        feedback.textContent = isValid ? '' : 'Please enter a valid email address.';
+    }
 
     // Function to toggle error styling
     function toggleErrorStyling(inputField, isValid) {

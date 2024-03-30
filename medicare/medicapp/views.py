@@ -14,7 +14,8 @@ from medicapp.forms import UserProfileForm
 from django.shortcuts import get_object_or_404
 from medicapp.models import Treatment
 from django.contrib.auth import login as auth_login
-
+import qrcode
+import base64
 from math import radians,sin,cos,sqrt,atan2
 
 #REGISTRATOIN
@@ -714,7 +715,7 @@ from .models import Appointment, Doctor
 from django.conf import settings  # Import the settings module
 
 @login_required
-def confirm_appointment(request, appointment_id):
+def confirm_appointment_doctor(request, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
     if appointment.doctor == request.user.doctor_profile:
         if appointment.status == 'scheduled':
@@ -739,7 +740,7 @@ from .models import Appointment, Doctor
 from django.conf import settings 
 
 @login_required
-def complete_appointment(request, appointment_id):
+def complete_appointment_doctor(request, appointment_id):
     appointment = Appointment.objects.get(pk=appointment_id)
     if appointment.doctor == request.user.doctor_profile:
         if appointment.status == 'confirmed':
@@ -1471,12 +1472,107 @@ def complete_appointment(request, appointment_id):
 #     }
 #     return render(request, 'patient/appointment_details.html', context)
 
+@login_required
+def qrscan(request, appointment_id):
+    # Retrieve the parameters from the query string or POST data
+    user = request.user
+
+    # Check if the current user is a seller
+        # If the user is a seller, retrieve the seller profile
+    current_counselor = Counselor.objects.get(user=user)
+
+        # Retrieve the orders for the current seller
+    seller_orders = AppointmentCounselling.objects.filter( counselor=current_counselor, id=appointment_id)
+    seller_orders_item = AppointmentCounselling.objects.get( counselor=current_counselor, id=appointment_id)
+
+
+    if seller_orders_item.status == 'confirmed':
+            # Check if there are matching OrderItem objects
+        if seller_orders.exists():
+
+            seller_orders_item.status = 'Completed'
+            seller_orders_item.save()
+            qr_error_message = "guyvgyv"
+
+            context = {
+                        'appointments': seller_orders,
+                            # 'qr_error_message': qr_error_message,
+                        }
+            return render(request, 'counselor/appointments_made.html', context)
+            
+        else:
+            appointments = AppointmentCounselling.objects.filter(counselor=current_counselor)
+            qr_error_message = "This appointment does not belong to your list of appointments."
+            context = {
+                    'qr_error_message': qr_error_message,
+                    'appointments': appointments,
+            }
+            return render(request, 'counselor/appointments_made.html', context)
+    else:
+
+        appointments = AppointmentCounselling.objects.filter(counselor=current_counselor)
+        qr_error_message = "This appointment is not confirmed"
+        context = {
+                    'qr_error_message': qr_error_message,
+                    'appointments': appointments,
+            }
+        return render(request, 'counselor/appointments_made.html', context)
+    # Redirect to the sellerorder page with an error message
+
+# from textblob import TextBlob
+
+# def analyze_sentiment(text):
+#     analysis = TextBlob(text)
+#     sentiment_score = analysis.sentiment.polarity
+#     return sentiment_score
+
+# def map_sentiment_to_rating(sentiment_score):
+#     if sentiment_score >= 0.5:
+#         return 5
+#     elif sentiment_score >= 0.2:
+#         return 4
+#     elif sentiment_score >= -0.2:
+#         return 3
+#     elif sentiment_score >= -0.5:
+#         return 2
+#     else:
+#         return 1
+
+
 def appointment_details(request):
     # Retrieve the current user's appointments
     user = request.user
     appointments = AppointmentCounselling.objects.filter(patient=user)
+    appointment_items = []
+    for appointment in appointments:
+        review = CounselingFeedback.objects.filter(user=request.user, Counselor=appointment.counselor ).first()
 
-    return render(request, 'patient/appointment_details.html', {'appointments': appointments})
+        if review:
+            review_status = review.review_status
+            review_id = review.pk
+            review_desc = review.description
+        else:
+            review_status = 'Pending'
+            review_id = None
+            review_desc = None
+            
+
+        qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+        qr.add_data(f'Appointment ID: {appointment.id}\n')            
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+
+        buffered = BytesIO()
+        qr_img.save(buffered, format="PNG")
+        appointment.qr_code_data = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+        appointment_items.append((appointment,review_status,review_id,review_desc))
+    return render(request, 'patient/appointment_details.html', {'appointment_items': appointment_items})
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -1644,7 +1740,7 @@ def bookmark_tip(request, tip_id):
             bookmarked_tip.delete()
             message = 'Bookmark removed'
         except ObjectDoesNotExist:
-            BookmarkedTip.objects.create(tip=tip, session_key=session_key)
+            BookmarkedTip.objeclts.create(tip=tip, session_key=session_key)
             message = 'Bookmark added'
         return JsonResponse({'message': message})
     else:
@@ -1686,3 +1782,317 @@ def delete_healthcare_tip(request, tip_id):
         tip.delete()
         return redirect('home')  # Redirect back to the list view
     return render(request, 'admin/delete_healthcare_tip.html', {'tip': tip})
+
+
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+
+# @login_required
+# def counselling_report(request):
+#     # Retrieve recent appointments for the current patient
+#     recent_appointments = AppointmentCounselling.objects.filter(patient=request.user).order_by('-date', '-time')[:5]
+#     return render(request, 'patient/counselling_report.html', {'appointments': recent_appointments})
+
+# @login_required
+# def generate_pdf_report(request):
+#     # Retrieve all appointments for the current patient
+#     appointments = AppointmentCounselling.objects.filter(patient=request.user)
+
+#     # Create a response object
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="counseling_report.pdf"'
+
+#     # Create a PDF document
+#     doc = SimpleDocTemplate(response, pagesize=letter)
+    
+#     # Create a list to hold the data for the table
+#     data = [['Date', 'Time', 'Counselor', 'Reason', 'Status']]
+
+#     # Add data for each appointment to the list
+#     for appointment in appointments:
+#         counselor_name = appointment.counselor.get_full_name()
+#         data.append([appointment.date, appointment.time, counselor_name, appointment.reason, appointment.status])
+
+#     # Create a table and style
+#     table = Table(data)
+#     style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+#                         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+#                         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#                         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+#                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#                         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+#                         ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+#     # Apply the style to the table
+#     table.setStyle(style)
+
+#     # Add the table to the PDF document
+#     doc.build([table])
+
+#     return response
+
+def health_tracker_home(request):
+    return render(request, 'patient/health_tracker_home.html')
+
+
+# from django.shortcuts import render, redirect
+# from .models import HealthMetric
+# from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
+
+# @login_required
+# def health_tracker(request):
+#     if request.method == 'POST':
+#         metric_type = request.POST.get('metric_type')
+#         value = request.POST.get('value')
+#         user = request.user
+
+#         # Save the health metric to the database
+#         HealthMetric.objects.create(user=user, metric_type=metric_type, value=value)
+
+#         messages.success(request, 'Health metric recorded successfully.')
+#         return redirect('health_tracker')
+
+#     return render(request, 'patient/health_tracker.html')
+
+
+# flutter
+
+
+
+from django.http import JsonResponse
+from .models import HealthcareTip
+
+def healthcare_tips_view(request):
+    healthcare_tips = HealthcareTip.objects.all()
+    data = [{'title': tip.title,
+             'description': tip.description,
+             'category': tip.category,
+             'date_added': tip.date_added.strftime("%Y-%m-%d %H:%M:%S"),
+             'image': tip.image.url if tip.image else None,
+             'likes_count': tip.likes_count,
+             'shares_count': tip.shares_count,
+             'bookmarks_count': tip.bookmarks_count} for tip in healthcare_tips]
+    return JsonResponse(data, safe=False)
+
+
+from django.shortcuts import render, redirect
+from .models import Ambulance
+
+def add_ambulance_details(request):
+    if request.method == 'POST':
+        contact_number = request.POST.get('contact_number')
+        location = request.POST.get('location')
+        vehicle_number = request.POST.get('vehicle_number')
+        vehicle_model = request.POST.get('vehicle_model')
+        vehicle_capacity = request.POST.get('vehicle_capacity')
+        driver_name = request.POST.get('driver_name')
+        
+        # Create and save the AmbulanceDetails object
+        ambulance = Ambulance(
+            contact_number=contact_number,
+            location=location,
+            vehicle_number=vehicle_number,
+            vehicle_model=vehicle_model,
+            vehicle_capacity=vehicle_capacity,
+            driver_name=driver_name
+        )
+        ambulance.save()
+        
+        # Redirect to a success page or any other page as needed
+        return redirect('home')  # Replace 'success_page' with the name of your success page URL pattern
+        
+    return render(request, 'admin/add_ambulance_details.html')
+
+
+
+# ambulance flutter
+from django.http import JsonResponse
+from .models import Ambulance
+
+def ambulance_list_view(request):
+    ambulances = Ambulance.objects.all()
+    data = [{'contact_number': ambulance.contact_number,
+             'location': ambulance.location,
+             'vehicle_number': ambulance.vehicle_number,
+             'vehicle_model': ambulance.vehicle_model,
+             'vehicle_capacity': ambulance.vehicle_capacity,
+             'driver_name': ambulance.driver_name} for ambulance in ambulances]
+    return JsonResponse(data, safe=False)
+
+
+def view_ambulance_details(request):
+    ambulance = Ambulance.objects.all()
+    verbose_name_plural = Ambulance._meta.verbose_name_plural.title()
+    return render(request, 'admin/view_ambulance_details.html', {'ambulance': ambulance, 'verbose_name_plural': verbose_name_plural})
+
+
+
+from django.shortcuts import render
+from .models import AppointmentCounselling
+
+def counseling_report(request):
+    # Get the latest counseling appointment for the patient
+    latest_counseling = AppointmentCounselling.objects.filter(patient=request.user).latest('date')
+
+    # Get the related patient and counselor information
+    patient = latest_counseling.patient
+    counselor = latest_counseling.counselor
+
+    context = {
+        'patient': patient,
+        'counselor': counselor,
+        'counseling': latest_counseling,
+    }
+
+    return render(request, 'patient/counselling_report.html', context)
+
+#VIDEO CONFERENCE
+def videocall_counselor(request):
+    return render(request, 'counselor/video_conference.html',{'name': request.user.first_name + " " + request.user.last_name})
+
+
+# def join_room(request):
+#     if request.method =='POST':
+#         roomID = request.POST['roomID']
+#         return redirect("/videocall_counselor?roomID="+3527)
+#     return render(request,'patient/video_conference.html')
+
+def join_room(request):
+    if request.method == 'POST':
+        roomID = request.POST['roomID']
+        return redirect("/meeting?roomID="+ roomID)
+    return render(request,'patient/join_room.html')
+
+#HEALTH MATRICES
+# from django.shortcuts import render, redirect
+# from .models import HealthMetric
+# from django.contrib import messages
+
+# def record_health_metric(request):
+#     if request.method == 'POST':
+#         # Retrieve data from the POST request
+#         weight = request.POST.get('weight')
+#         systolic_bp = request.POST.get('systolic_bp')
+#         diastolic_bp = request.POST.get('diastolic_bp')
+#         blood_sugar = request.POST.get('blood_sugar')
+#         heart_rate = request.POST.get('heart_rate')
+#         print(heart_rate)
+#         # Create a new HealthMetric object and save it to the database
+#         health_metric = HealthMetric.objects.create(
+#             user=request.user,
+#             weight=float(weight),
+#             blood_pressure_systolic=int(systolic_bp),
+#             blood_pressure_diastolic=int(diastolic_bp),
+#             blood_sugar=float(blood_sugar),
+#             heart_rate=int(heart_rate),
+#             )
+#         messages.success(request, 'Health metric recorded successfully.')
+#         return redirect('health_tracker_home')  # Redirect to the home page or another appropriate URL
+
+#     # If the request method is not POST, render the form template
+#     return render(request, 'patient/health_tracker.html')
+
+
+
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter, inch
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+
+from .models import AppointmentCounselling
+
+def generate_pdf_counselling(request):
+    # Fetch counseling session from the database
+    counseling_session = AppointmentCounselling.objects.first()  # Assuming you have at least one counseling session
+
+    # Extract patient, counselor, and counseling details
+    patient = counseling_session.patient
+    counselor = counseling_session.counselor
+    counseling_date = counseling_session.date
+    counseling_time = counseling_session.time
+    counseling_reason = counseling_session.reason
+    counseling_status = counseling_session.status
+
+    # Create a buffer for PDF
+    buffer = BytesIO()
+
+    # Create PDF document
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # Title
+    title = "Counseling Report"
+    title_style = styles["Title"]
+    title_paragraph = Paragraph(title, title_style)
+
+    # Patient Information
+    patient_info = [
+        ("Name:", patient.profile.full_name),
+        ("Gender:", patient.profile.gender),
+        ("Phone Number:", patient.profile.phone_number),
+    ]
+    patient_info_table = Table(patient_info, colWidths=[100, 300])
+    patient_info_table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                                            ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+    patient_info_table.setStyle(TableStyle([('BOX', (0, 0), (-1, -1), 2, colors.black)]))
+
+    # Counselor Information
+    counselor_info = [
+        ("Name:", counselor.get_full_name()),
+        ("Email:", counselor.email),
+    ]
+    counselor_info_table = Table(counselor_info, colWidths=[100, 300])
+    counselor_info_table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                                               ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                                               ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                               ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                               ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                               ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                                               ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+    counselor_info_table.setStyle(TableStyle([('BOX', (0, 0), (-1, -1), 2, colors.black)]))
+
+    # Counseling Information
+    counseling_info = [
+        ("Date:", counseling_date),
+        ("Time:", counseling_time),
+        ("Reason:", counseling_reason),
+        ("Status:", counseling_status),
+    ]
+    counseling_info_table = Table(counseling_info, colWidths=[100, 300])
+    counseling_info_table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                                                ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+    counseling_info_table.setStyle(TableStyle([('BOX', (0, 0), (-1, -1), 2, colors.black)]))
+
+    # Build PDF content
+    content = [title_paragraph, Spacer(1, 12), patient_info_table, Spacer(1, 12), counselor_info_table,
+               Spacer(1, 12), counseling_info_table]
+
+    # Add content to PDF
+    doc.build(content)
+
+    # Get the PDF file content from the buffer
+    pdf_data = buffer.getvalue()
+    buffer.close()
+
+    # Create an HTTP response with PDF content
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="counseling_report.pdf"'
+    response.write(pdf_data)
+    return response
+
+
+def home_counselor(request):
+    return render(request,'counselor/home_page.html')

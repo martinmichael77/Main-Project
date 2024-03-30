@@ -46,12 +46,13 @@
                                         <td>{{ appointment.time }}</td>
                                         <td>
                                             {% if appointment.status == 'scheduled' %}
-                                                <form method="post" action="{% url 'confirm_appointment' appointment.id %}">
+                                            
+                                                <form method="post" action="{% url 'confirm_appointment_doctor' appointment.id %}">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-success btn-sm">Confirm</button>
                                                 </form>
                                             {% elif appointment.status == 'confirmed' %}
-                                                <form method="post" action="{% url 'complete_appointment' appointment.id %}">
+                                                <form method="post" action="{% url 'complete_appointment_doctor' appointment.id %}">
                                                     {% csrf_token %}
                                                     <button type="submit" class="btn btn-primary btn-sm">Complete</button>
                                                 </form>

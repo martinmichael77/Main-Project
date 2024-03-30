@@ -1,0 +1,43 @@
+{% extends 'patient/base.html' %}
+{% block body %}
+    <canvas id="healthChart" width="800" height="400"></canvas>
+
+    <script>
+        var ctx = document.getElementById('healthChart').getContext('2d');
+        var chartData = {{ chart_data|safe }};
+        var timestamps = JSON.parse(chartData.timestamps);
+        var weights = JSON.parse(chartData.weights);
+        var systolic_bps = JSON.parse(chartData.systolic_bps);
+        var diastolic_bps = JSON.parse(chartData.diastolic_bps);
+        var blood_sugars = JSON.parse(chartData.blood_sugars);
+        var heart_rates = JSON.parse(chartData.heart_rates);
+
+        var healthChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [
+                    {
+                        label: 'Weight (kg)',
+                        data: weights,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    },
+                    {
+                        label: 'Systolic BP (mmHg)',
+                        data: systolic_bps,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    },
+                    // Add more datasets for other metrics as needed
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+{% endblock %}

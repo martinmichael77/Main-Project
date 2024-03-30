@@ -1,0 +1,46 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card-body">
+                <h1>Add Ambulance Details</h1>
+                <div class="module">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col" class="text-center"><input type="checkbox" id="action-toggle" /></th>
+                                <th scope="col">{{ verbose_name_plural }}</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Contact Number</th>
+                                <th scope="col">Vehicle Number</th>
+                                <th scope="col">Vehicle Model</th>
+                                <th scope="col">Vehicle Capacity</th>
+                                <th scope="col">Driver Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in ambulance %}
+                            <tr class="{% cycle 'row1' 'row2' %}">
+                                <td class="action-checkbox text-center">
+                                    <input type="checkbox" name="_selected_action" value="{{ obj.pk }}" class="action-select" />
+                                </td>
+                                <td>{{ obj }}</td>
+                                <td>{{ obj.location }}</td>
+                                <td>{{ obj.contact_number }}</td>
+                                <td>{{ obj.vehicle_number }}</td>
+                                <td>{{ obj.vehicle_model }}</td>
+                                <td>{{ obj.vehicle_capacity }}</td>
+                                <td>{{ obj.driver_name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

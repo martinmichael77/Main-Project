@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{% static 'core/css/bootstrap/four/bootstrap.css' %}">
     <link href="{% static 'core/css/sb-admin.css' %}" rel="stylesheet">
     <link href="{% static 'core/css/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    
 </head>
 
 <body id="page-top">
@@ -54,7 +55,9 @@
                 <span>Logged As {{ user.username }}</span>
             </a>
         </li>
-        {% if status == '1' %}
+
+       
+        {% if user.profile.birth_date %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'diagnosis' %}">
                 <i class="fas fa-microscope text-primary"></i>
@@ -79,12 +82,7 @@
                 <span style="color: white">Medical Report</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="">
-                <i class="fas fa-calendar text-primary"></i>
-                <span style="color: white">Presciption Refill</span>
-            </a>
-        </li>
+
         
         <li class="nav-item">
             <a class="nav-link" href="{% url "patient_counselling" %} ">
@@ -104,6 +102,12 @@
                 <span style="color: white">Healthcare Tips</span>
             </a>
         </li>
+        {% comment %} <li class="nav-item">
+            <a class="nav-link" href="{% url "health_tracker_home" %}">
+                <i class="fas fa-calendar text-primary"></i>
+                <span style="color: white">Health Tracker</span>
+            </a>
+        </li> {% endcomment %}
         {% else %}
         <li class="nav-item">
             <a class="nav-link" href="{% url 'create_profile' %}">

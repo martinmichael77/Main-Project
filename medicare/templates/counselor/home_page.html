@@ -1,0 +1,56 @@
+{% extends 'counselor/base_counselor.html' %}
+{% load static %}
+
+{% block body %}
+<div id="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"></li>
+        </ol>
+    </div>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Counseling Center</a>
+            <!-- Add more navigation links here -->
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="jumbotron text-center">
+        <h1>Welcome to Our Counseling Services</h1>
+        <p>Empowering Minds, Healing Hearts</p>
+        <a href="#contact" class="btn btn-primary btn-lg">Contact Us</a>
+    </div>
+
+    <!-- About Section -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>About Us</h2>
+                <p>We provide professional counseling services to individuals, couples, and families.</p>
+            </div>
+            <div class="col-md-6">
+                <!-- Add an image here -->
+                <img src="{% static 'counseling-image.jpg' %}" alt="Counseling Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div id="contact" class="container">
+        <h2>Contact Us</h2>
+        <p>If you need support or have any questions, feel free to reach out:</p>
+        <ul>
+            <li>Email: info@counselingcenter.com</li>
+            <li>Phone: +1 (123) 456-7890</li>
+        </ul>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div>
+{% endblock %}

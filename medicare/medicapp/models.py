@@ -218,7 +218,26 @@ class CounselingFeedback(models.Model):
     counselor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='counselor_feedbacks')
     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient_feedbacks')
     feedback = models.TextField()
+    # REVIEWED = 'reviewed'
+    # PENDING = 'pending'
+    
+    # REVIEW_CHOICES = [
+    #     (REVIEWED, 'reviewed'),
+    #     (PENDING, 'Pending'),
+    # ]
 
+    # review_id = models.AutoField(primary_key=True)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # counselor = models.ForeignKey(Counselor, on_delete=models.CASCADE)
+    # rating = models.IntegerField()
+    # outof_rating = models.IntegerField(default=5, editable=False)
+    # feedback = models.TextField()
+    # review_status = models.CharField(
+    #     max_length=20,
+    #     choices=REVIEW_CHOICES,
+    #     default=PENDING,
+    # )
     def __str__(self):
         return f"Feedback for Counseling Session with {self.counselor.username}"
 
@@ -250,3 +269,38 @@ class LikedTip(models.Model):
 class BookmarkedTip(models.Model):
     session_key = models.CharField(max_length=40)
     tip = models.ForeignKey(HealthcareTip, on_delete=models.CASCADE)
+
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class HealthMetric(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='health_metrics')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    weight = models.FloatField(null=True, blank=True)  # in kilograms
+    blood_pressure_systolic = models.IntegerField(null=True, blank=True)  # systolic blood pressure (mmHg)
+    blood_pressure_diastolic = models.IntegerField(null=True, blank=True)  # diastolic blood pressure (mmHg)
+    blood_sugar = models.FloatField(null=True, blank=True)  # blood sugar level (mg/dL)
+    heart_rate = models.IntegerField(null=True, blank=True)  # heart rate (bpm)
+    # Add more fields as needed
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"Health Metric for {self.user.username} recorded at {self.timestamp}"
+
+
+
+class Ambulance(models.Model):
+    contact_number = models.CharField(max_length=20)
+    location = models.CharField(max_length=100)
+    vehicle_number = models.CharField(max_length=20)
+    vehicle_model = models.CharField(max_length=100)
+    vehicle_capacity = models.IntegerField()
+    driver_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Ambulance - {self.vehicle_number}"
+
