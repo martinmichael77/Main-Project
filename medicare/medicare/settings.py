@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'medicapp',
     'jazzmin',
     'allauth',
-    'easy_pdf',
+    # 'easy_pdf',
     'crispy_forms',
     'django.contrib.humanize',
     'django.contrib.admin',
