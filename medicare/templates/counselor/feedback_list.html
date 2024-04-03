@@ -10,24 +10,47 @@
             <li class="breadcrumb-item active" style="color: #555;">Counselor Feedback</li>
         </ol>
 
+        <h2 class="text-muted mb-1">Reviews for  {{ counselor.first_name }}</h2>
+          
         <!-- Icon Cards -->
-        <div class="row">
+        <div class="row" style="margin-top:50px;">
             <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h1 class="card-title" style="color: #4CAF50; margin-bottom: 20px;">Counselor Feedback</h1>
-                        <ul style="list-style-type: none; padding-left: 0;">
-                            {% for fb in feedback %}
-                            <li style="margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
-                                <span style="font-weight: bold; color: #333;">{{ fb.patient.username }}:</span> 
-                                <span>{{ fb.feedback }}</span>
-                            </li>
-                            {% empty %}
-                            <li style="margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">No feedback available.</li>
-                            {% endfor %}
-                        </ul>
+                <div class="row" id="reviewssection">
+                    <div class="col-12">
+                      <div class="preview-list">
+                        {% for review in allreviews %}
+                        <div class="preview-item border-bottom">
+                          {% with review_rating=review.rating|stringformat:"d"|default:0 %}
+                         
+                          
+                          <div class="preview-item-content d-sm-flex flex-grow ">
+                            <div class="flex-grow">
+                              <h6 class="preview-subject">{{ review.description }}</h6>
+                              <p class="text-muted mb-0">{{ review.user.profile.full_name }}</p>
+                              
+                              <div class="mr-auto text-sm-right">
+                                {% for i in "12345" %}
+                                {% if i <= review_rating %}
+                                    <small class="fas fa-star text-dark" ></small>
+                                {% else %}
+                                    <small class="fas fa-star text-light" ></small>
+                                {% endif %}
+                                
+                                {% endfor %}
+                              </div>
+                            </div>
+                           
+                          </div>
+                          {% endwith %}
+                        </div>
+                        {% empty %}
+                        <div class="preview-item border-bottom">
+                          <h4 class="card-title mb-1">No reviews available</h4>
+                        </div>
+                        {% endfor %}
+                      </div>
                     </div>
-                </div>
+                  </div>
             </div>
         </div>
     </div>

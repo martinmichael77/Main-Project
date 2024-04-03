@@ -1519,33 +1519,71 @@ def qrscan(request, appointment_id):
         return render(request, 'counselor/appointments_made.html', context)
     # Redirect to the sellerorder page with an error message
 
-# from textblob import TextBlob
+from .models import Review
+from textblob import TextBlob
 
-# def analyze_sentiment(text):
-#     analysis = TextBlob(text)
-#     sentiment_score = analysis.sentiment.polarity
-#     return sentiment_score
+def analyze_sentiment(text):
+    analysis = TextBlob(text)
+    sentiment_score = analysis.sentiment.polarity
+    return sentiment_score
 
-# def map_sentiment_to_rating(sentiment_score):
-#     if sentiment_score >= 0.5:
-#         return 5
-#     elif sentiment_score >= 0.2:
-#         return 4
-#     elif sentiment_score >= -0.2:
-#         return 3
-#     elif sentiment_score >= -0.5:
-#         return 2
-#     else:
-#         return 1
+def map_sentiment_to_rating(sentiment_score):
+    if sentiment_score >= 0.5:
+        return 5
+    elif sentiment_score >= 0.2:
+        return 4
+    elif sentiment_score >= -0.2:
+        return 3
+    elif sentiment_score >= -0.5:
+        return 2
+    else:
+        return 1
 
+@login_required
+def submit_review(request):
+  
+    if request.method == 'POST':
+        print(request.POST)
+        print(123123)
+        counselor_id = request.POST.get('seller_id')
+        counselor = Counselor.objects.get(id=counselor_id)
+        description = request.POST.get('description')
+        review_id = request.POST.get('review_id')  # Get the review_id from the form
 
+        # Sentiment Analysis using TextBlob
+        sentiment_score = analyze_sentiment(description)
+
+        # Calculate the rating based on sentiment score
+        star_rating = map_sentiment_to_rating(sentiment_score)
+
+        if review_id:
+            # If review_id is available, it's an edit action
+            review = Review.objects.get(review_id=review_id)
+            review.description = description
+            review.rating = star_rating  # Update the rating based on sentiment
+            review.save()
+        else:
+            # It's an add action
+            review = Review.objects.create(
+                user=request.user,
+                rating=star_rating,  # Use calculated rating
+                description=description,
+                counselor=counselor,
+                review_status='REVIEWED',
+            )
+        print(review_id)
+       
+        # Redirect to a success page or the product detail page
+        return redirect('appointment_details')
+    
 def appointment_details(request):
     # Retrieve the current user's appointments
     user = request.user
     appointments = AppointmentCounselling.objects.filter(patient=user)
+    
     appointment_items = []
     for appointment in appointments:
-        review = CounselingFeedback.objects.filter(user=request.user, Counselor=appointment.counselor ).first()
+        review = Review.objects.filter(user=request.user, counselor=appointment.counselor ).first()
 
         if review:
             review_status = review.review_status
@@ -1577,27 +1615,23 @@ def appointment_details(request):
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import CounselingFeedback
-
+from django.db.models import Avg
 @login_required
 def submit_feedback(request):
-    if request.method == 'POST':
-        feedback_text = request.POST.get('feedback')
-        counselor_id = request.POST.get('counselor')
-        counselor = Counselor.objects.get(id=counselor_id)
-        CounselingFeedback.objects.create(counselor=counselor.user, patient=request.user, feedback=feedback_text)
-        return redirect('submit_feedback')
-    counselors = Counselor.objects.all()
-    return render(request, 'patient/feedback_form.html', {'counselors': counselors})
+   
+    return render(request, 'patient/feedback_form.html')
 
 
 from django.shortcuts import render
-from .models import CounselingFeedback
 
 def counselor_feedback(request):
-    counselor = request.user
-    feedback = CounselingFeedback.objects.filter(counselor=counselor)
-    return render(request, 'counselor/feedback_list.html', {'feedback': feedback})
+    
+    counselor = Counselor.objects.get(user=request.user)
+    
+    allreviews = Review.objects.filter(counselor=counselor)    
+    avg_rating = allreviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    return render(request, 'counselor/feedback_list.html',{'allreviews':allreviews,
+        'avg_rating':avg_rating,'counselor':counselor})
 
 
 

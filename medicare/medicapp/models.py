@@ -193,6 +193,32 @@ class UserSellerDistance(models.Model):
         unique_together = ('user', 'hospital')
 
 
+class Review(models.Model):
+    REVIEWED = 'reviewed'
+    PENDING = 'pending'
+    
+    REVIEW_CHOICES = [
+        (REVIEWED, 'reviewed'),
+        (PENDING, 'Pending'),
+    ]
+
+    review_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    counselor = models.ForeignKey(Counselor, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    outof_rating = models.IntegerField(default=5, editable=False)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    review_status = models.CharField(
+        max_length=20,
+        choices=REVIEW_CHOICES,
+        default=PENDING,
+    )
+
+
+    def _str_(self):
+        return f"Review by {self.user.username}"
+    
 class AppointmentCounselling(models.Model):
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
@@ -213,33 +239,6 @@ class AppointmentCounselling(models.Model):
 
 from django.db import models
 from django.contrib.auth.models import User
-
-class CounselingFeedback(models.Model):
-    counselor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='counselor_feedbacks')
-    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='patient_feedbacks')
-    feedback = models.TextField()
-    # REVIEWED = 'reviewed'
-    # PENDING = 'pending'
-    
-    # REVIEW_CHOICES = [
-    #     (REVIEWED, 'reviewed'),
-    #     (PENDING, 'Pending'),
-    # ]
-
-    # review_id = models.AutoField(primary_key=True)
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    # counselor = models.ForeignKey(Counselor, on_delete=models.CASCADE)
-    # rating = models.IntegerField()
-    # outof_rating = models.IntegerField(default=5, editable=False)
-    # feedback = models.TextField()
-    # review_status = models.CharField(
-    #     max_length=20,
-    #     choices=REVIEW_CHOICES,
-    #     default=PENDING,
-    # )
-    def __str__(self):
-        return f"Feedback for Counseling Session with {self.counselor.username}"
 
 
 from django.db import models

@@ -93,10 +93,11 @@ urlpatterns = [
     path('add_ambulance_details', views.add_ambulance_details, name='add_ambulance_details'),
     path('view_ambulance_details', views.view_ambulance_details, name='view_ambulance_details'),
     path('counseling/report/', views.counseling_report, name='counseling_report'),
-    path('counseling/report/', views.generate_pdf_counselling, name='generate_pdf_counselling'),
+    path('counseling/report/pdf', views.generate_pdf_counselling, name='generate_pdf_counselling'),
     # path('counseling/report/pdf/', views.CounselingReportPDF.as_view(), name='counseling_report_pdf'),
     path('meeting', views.videocall_counselor, name='meeting'),
     path('join_room', views.join_room, name='join_room'),
+    path('submit_review', views.submit_review, name='submit_review'),
     path('home_counselor', views.home_counselor, name='home_counselor'),
 
 

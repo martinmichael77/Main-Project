@@ -104,8 +104,7 @@
 <div id="qrScannerModal" class="modal">
     <div class="modal-content" style="width: 500px; margin: 0 auto; margin-top:100px;">
         <button class="close-modal" onclick="closeQrScannerModal()">&times;</button>
-        <h5>Place the QR Code in this space</h5>
-        <input type="file" id="fileInput" accept="image/*">
+       
         <button onclick="scanQRCodeFromFile()">Scan from File</button>
         <video id="qrScanner" width="100%" height="100%"></video>
     </div>
@@ -222,13 +221,12 @@
         // Extract relevant information from the match
             var appointmentId = match[1];
             // Customize this function to handle the scanned content
-            alert('Scanned content: ' + content +appointmentId);
             // You can perform actions based on the scanned content
             // For example, make an AJAX request to validate the order ID
             // and update the UI accordingly.
             window.location.href = "{% url 'qrscan' appointment_id=0 %}".replace('0', appointmentId);
             // If the content doesn't match the expected format, show an alert or handle accordingly
-            alert('Invalid QR code content. Please scan a valid QR code.');
+           
         }
     // Perform any additional logic here, e.g., make an AJAX request to validate the order ID
 

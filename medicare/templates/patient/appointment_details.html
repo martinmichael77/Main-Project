@@ -18,10 +18,11 @@
                                 <th>Reason</th>
                                 <th>QR Code</th>
                                 <th>Status</th>
+                                <th>Review</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for appointment in appointment_items %}
+                            {% for appointment,review_status,review_id,review_desc in appointment_items %}
                             <tr>
                                 <td>{{ appointment.counselor.get_full_name }}</td>
                                 <td>{{ appointment.date }}</td>
@@ -33,6 +34,32 @@
                                     </a>
                                 </td>
                                 <td>{{ appointment.status }}</td>
+                                <td>{% if appointment.status == 'Completed' %}       
+                                    {% if review_status == 'Pending' %}
+                                    <form id="reviewForm" method="post" action="{% url 'submit_review' %}">
+                                        {% csrf_token %}
+                                        {% comment %} <h2 id="modalTitle">Add Review</h2> {% endcomment %}
+                                        
+                                        <textarea name="description" id="description" rows="4" required></textarea>
+                                        
+                                        <input type="hidden" id="seller_id" name="seller_id" value="{{ appointment.counselor.id}}">
+                                        <input type="hidden" id="review_id" name="review_id" value="">
+                                        <button class="btn btn-inverse-success btn-fw" type="submit" id="submitBtn"  style="margin-top:40px;">Submit Review</button>
+                                    </form>
+                                    {% else %}
+                                    <form id="reviewForm" method="post" action="{% url 'submit_review' %}">
+                                        {% csrf_token %}
+                                        {% comment %} <h2 id="modalTitle">Edit Review</h2> {% endcomment %}
+                                        
+                                        <textarea name="description" id="description" rows="4" required>{{ review_desc }}</textarea>
+                                        <input type="hidden" id="seller_id" name="seller_id" value="{{ appointment.counselor.id}}">
+                                        <input type="hidden" id="review_id" name="review_id" value="{{ review_id }}">
+                                        <button class="btn btn-inverse-success btn-fw" type="submit" id="submitBtn"  style="margin-top:40px;">Submit Review</button>
+                                    </form>
+                                    {% endif %}        
+                                {% else %}
+                                    <label class="badge badge-success">Not Allowed</label>
+                                {% endif %}</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -41,63 +68,79 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="overlay2" id="overlay2">
-                        <!-- Add this modal to your HTML template -->
-                        <div id="qrModal" class="custom-modal">
-                            <div class="modal-content">
-                                <button class="close-modal" onclick="closeQrCodeModal()">&times;</button>
-                                <img src="data:image/png;base64,${qrCodeData}" alt="QR Code" class="img-fluid">
-                            </div>
-                        </div>
-                   
-                </div>
-                </div>
+                  
+               
             </div>
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function() {
-        $(".openQrCodeModal").click(function() {
-            var appointmentId = $(this).data("appointment-id");
-            $("#qrModal img").attr("src", "data:image/png;base64," + qrCodeData);
-            $("#qrModal").show();
-            $("#overlay2").show();
+
+    <script>
+        $(document).ready(function() {
+            var reviewModal = $("#reviewModal");
+            var overlay = $("#overlay");
+            var modalContent = $(".modal-content"); // Select the modal content container
+            var modalTitle = $("#modalTitle");
+            var ratingInput = $("#rating");
+            var descriptionInput = $("#description");
+            var sellerIdInput = $("#seller_id");
+            var reviewIdInput = $("#review_id");
+            var submitBtn = $("#submitBtn");
+        
+            $(".openModalBtn").click(function() {
+                var sellerId = $(this).data("seller");
+                var sellerName = $(this).data("seller-name");
+                var reviewId = $(this).data("review-id");
+                var reviewDesc = $(this).data("review-desc"); 
+                
+                if (reviewId) {
+                    modalTitle.text("Edit Review for " + sellerName);
+                    submitBtn.text("Edit Review");
+                    var rating = $(this).data("rating");
+                    var description = $(this).data("description");
+                    ratingInput.val(rating);
+                    descriptionInput.val(reviewDesc);
+                    reviewIdInput.val(reviewId);
+                } else {
+                    modalTitle.text("Add Review for " + sellerName);
+                    submitBtn.text("Submit Review");
+                    ratingInput.val("");
+                    descriptionInput.val("");
+                    reviewIdInput.val("");
+                }
+        
+                sellerIdInput.val(sellerId);
+                reviewModal.css("display", "block");
+                overlay.css("display", "block");
+            });
+        
+            // Prevent closing the modal when clicking inside the modal content
+            modalContent.click(function(event) {
+                event.stopPropagation(); // Stop event propagation
+            });
+        
+            // Close the modal when the user clicks the close button
+            $("#reviewModal .close").click(function() {
+                closeModal();
+            });
+        
+            // Close the modal and overlay when the user clicks outside the modal
+            overlay.click(function() {
+                closeModal();
+            });
+        
+            // Submit the review form when it's submitted
+            $("#reviewForm").submit(function() {
+                // You can add validation or other logic here if needed
+                return true; // Allow the form to be submitted
+            });
+        
+            // Function to close the modal
+            function closeModal() {
+                reviewModal.css("display", "none");
+                overlay.css("display", "none");
+            }
         });
-    
-        $("#qrModal .close-modal").click(function() {
-            closeModal();
-        });
-    
-        $("#overlay2").click(function() {
-            closeModal();
-        });
-    
-        function closeModal() {
-            $("#qrModal").hide();
-            $("#overlay2").hide();
-        }
-    });
-    
-</script>
-<style>
-    .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
-                    max-width: 400px;
-        margin: 0 auto;
-        margin-top: 10%;
-    }
-    .overlay2 {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9998; /* Place it below the modal */
-    }
-</style>
+    </script>
+
 {% endblock %}
